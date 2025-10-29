@@ -1,3 +1,4 @@
+-- Лабораторная работа 5
 USE master;
 GO
 
@@ -105,26 +106,6 @@ SELECT *
 FROM FLIGHT;
 GO
 
-INSERT INTO AIRCRAFT
-    (AircraftID, BoardNumber, Model, Manufacturer, PassengerCapacity, LoadCapacity, AircraftAge, Status)
-VALUES
-    (152, 'PH-ABC', 'A320neo', 'Airbus', 165, 9500.00, 7, 1);
-GO
-
-INSERT INTO FLIGHT
-    (FlightID, FlightNumber, FlightDate, Airline, DepartureAirport, ArrivalAirport, BoardingTime, DepartureTime, ArrivalTime, Status, AircraftID)
-VALUES
-    (1001, 'KL456', '2025-10-29', 'KL', 'AMS', 'BCN', '2025-10-29T13:20:00', '2025-10-29T14:00:00', '2025-10-29T15:45:00', 1, 152);
-GO
-
-SELECT *
-FROM AIRCRAFT;
-GO
-
-SELECT *
-FROM FLIGHT;
-GO
-
 -- Task 6:
 ALTER DATABASE Lab5
     MODIFY FILEGROUP [PRIMARY] DEFAULT;
@@ -150,6 +131,8 @@ ALTER DATABASE Lab5
     REMOVE FILEGROUP LargeFileGroup;
 GO
 
+SELECT * FROM saveFLIGHT;
+
 -- Task 7:
 IF SCHEMA_ID(N'BuildingSchema') IS NOT NULL
 BEGIN
@@ -174,4 +157,3 @@ GO
 
 DROP SCHEMA BuildingSchema;
 GO
-
