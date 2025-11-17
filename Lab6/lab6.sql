@@ -1,3 +1,4 @@
+-- Лабораторная работа 6
 USE master;
 GO
 
@@ -26,3 +27,8 @@ LOG ON (NAME = Lab6_log,
     FILEGROWTH = 5MB
 );
 GO
+
+USE Lab6;
+GO
+
+-- Task 1:
