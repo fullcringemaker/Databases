@@ -88,15 +88,15 @@ END;
 GO
 
 -- Task 4:
-IF OBJECT_ID('dbo.Seq_CrewID', 'SO') IS NULL
-    CREATE SEQUENCE dbo.Seq_CrewID AS INT START WITH 1 INCREMENT BY 1;
+IF OBJECT_ID('dbo.SeqCrewID', 'SO') IS NULL
+    CREATE SEQUENCE dbo.SeqCrewID AS INT START WITH 1 INCREMENT BY 1;
 GO
 
-IF OBJECT_ID('dbo.Crew', 'U') IS NULL
+IF OBJECT_ID('dbo.CREW', 'U') IS NULL
 BEGIN
-    CREATE TABLE dbo.Crew
+    CREATE TABLE dbo.CREW
     (
-        CrewID INT PRIMARY KEY DEFAULT NEXT VALUE FOR dbo.Seq_CrewID,
+        CrewID INT PRIMARY KEY DEFAULT NEXT VALUE FOR dbo.SeqCrewID,
         LicenseNumber VARCHAR(15) UNIQUE NOT NULL,
         FirstName NVARCHAR(30) NOT NULL,
         LatName NVARCHAR(30) NOT NULL,
@@ -136,7 +136,7 @@ GO
 -- CASCADE
 IF OBJECT_ID('dbo.ChildTableWithCascade', 'U') IS NULL
 BEGIN
-    CREATE TABLE dbo.ChildTable_Cascade
+    CREATE TABLE dbo.ChildTableWithCascade
     (
         ChildID INT PRIMARY KEY IDENTITY(1,1),
         ParentID INT,
@@ -176,3 +176,74 @@ END;
 GO
 
 -- Проверка 
+INSERT INTO dbo.AIRCRAFT
+    (BoardNumber, Model, Manufacturer, PassengerCapacity, LoadCapacity, AircraftAge, Status)
+VALUES
+    ('N123AA', 'A320neo', N'Airbus', 180, 9000.00, 3, 1);
+GO
+INSERT INTO dbo.AIRCRAFT
+    (BoardNumber, Model, Manufacturer, PassengerCapacity, LoadCapacity, AircraftAge, Status)
+VALUES
+    ('N123AB', 'A320neo', N'Airbus', 180, 9000.00, 3, 1);
+GO
+SELECT SCOPE_IDENTITY() AS LastInsertedID;
+
+INSERT INTO dbo.FLIGHT
+    (FlightNumber, FlightDate, Airline, DepartureAirport, ArrivalAirport, BoardingTime, DepartureTime, ArrivalTime, Status, AircraftID)
+VALUES
+    ('KL123', '2025-11-20', 'KL', 'AMS', 'BCN', '2025-11-20T07:15:00', '2025-11-20T08:00:00', '2025-11-20T10:45:00', 3, 1)
+GO
+
+INSERT INTO dbo.CREW
+    (LicenseNumber, FirstName, LatName, Gender, Position, FlyingHours, LicenseExpiryDate)
+VALUES
+    ('EST-PIL-00123', N'Ivan', N'Petrov', 1, 1, 3560.75, '2028-06-30')
+GO
+
+INSERT INTO dbo.ParentTable
+    (ParentName)
+VALUES
+    ('Name for Parent');
+GO
+
+INSERT INTO dbo.ChildTableWithNoAction
+    (ParentID, Description)
+VALUES
+    (1, 'Description for NoAction Child');
+GO
+
+INSERT INTO dbo.ChildTableWithCascade
+    (ParentID, Description)
+VALUES
+    (1, 'Description for Cascade Child');
+GO
+
+INSERT INTO dbo.ChildTableWithSetNull
+    (ParentID, Description)
+VALUES
+    (1, 'Description for SetNull Child');
+GO
+
+INSERT INTO dbo.ChildTableWithSetDefault
+    (ParentID, Description)
+VALUES
+    (1, 'Description for SetDefault Child');
+GO
+
+SELECT *
+FROM dbo.AIRCRAFT;
+SELECT *
+FROM dbo.FLIGHT;
+SELECT *
+FROM dbo.CREW;
+SELECT *
+FROM dbo.ParentTable;
+SELECT *
+FROM dbo.ChildTableWithNoAction;
+SELECT *
+FROM dbo.ChildTableWithCascade;
+SELECT *
+FROM dbo.ChildTableWithSetNull;
+SELECT *
+FROM dbo.ChildTableWithSetDefault;
+GO
