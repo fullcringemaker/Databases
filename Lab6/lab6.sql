@@ -72,3 +72,40 @@ END;
 GO
 
 -- Task 3:
+IF OBJECT_ID('dbo.CrewGUID', 'U') IS NULL
+BEGIN
+    CREATE TABLE dbo.CrewGUID
+    (
+        CrewGUID UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
+        FirstName NVARCHAR(30),
+        LatName NVARCHAR(30),
+        Gender TINYINT,
+        Position TINYINT,
+        FlyingHours DECIMAL(6,2),
+        LicenseExpiryDate DATE
+    );
+END;
+GO
+
+-- Task 4:
+IF OBJECT_ID('dbo.Seq_CrewID', 'SO') IS NULL
+    CREATE SEQUENCE dbo.Seq_CrewID AS INT START WITH 1 INCREMENT BY 1;
+GO
+
+IF OBJECT_ID('dbo.Crew', 'U') IS NULL
+BEGIN
+    CREATE TABLE dbo.Crew
+    (
+        CrewID INT PRIMARY KEY DEFAULT NEXT VALUE FOR dbo.Seq_CrewID,
+        LicenseNumber VARCHAR(15) UNIQUE NOT NULL,
+        FirstName NVARCHAR(30) NOT NULL,
+        LatName NVARCHAR(30) NOT NULL,
+        Gender TINYINT NOT NULL,
+        Position TINYINT NOT NULL,
+        FlyingHours DECIMAL(6,2) NOT NULL,
+        LicenseExpiryDate DATE Not NULL
+    );
+END;
+GO
+
+-- Task 5:
