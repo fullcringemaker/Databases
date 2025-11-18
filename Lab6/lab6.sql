@@ -109,3 +109,70 @@ END;
 GO
 
 -- Task 5:
+IF OBJECT_ID('dbo.ParentTable', 'U') IS NULL
+BEGIN
+    CREATE TABLE dbo.ParentTable
+    (
+        ParentID INT PRIMARY KEY IDENTITY(1,1),
+        ParentName NVARCHAR(100) NOT NULL
+    );
+END;
+GO
+
+-- NO ACTION
+IF OBJECT_ID('dbo.ChildTableWithNoAction', 'U') IS NULL
+BEGIN
+    CREATE TABLE dbo.ChildTableWithNoAction
+    (
+        ChildID INT PRIMARY KEY IDENTITY(1,1),
+        ParentID INT,
+        Description NVARCHAR(200),
+        CONSTRAINT FK_ParentChildWithNoAction FOREIGN KEY (ParentID) 
+        REFERENCES dbo.ParentTable(ParentID) ON DELETE NO ACTION ON UPDATE NO ACTION
+    );
+END;
+GO
+
+-- CASCADE
+IF OBJECT_ID('dbo.ChildTableWithCascade', 'U') IS NULL
+BEGIN
+    CREATE TABLE dbo.ChildTable_Cascade
+    (
+        ChildID INT PRIMARY KEY IDENTITY(1,1),
+        ParentID INT,
+        Description NVARCHAR(200),
+        CONSTRAINT FK_ParentChildWithCascade FOREIGN KEY (ParentID) 
+        REFERENCES dbo.ParentTable(ParentID) ON DELETE CASCADE ON UPDATE NO ACTION
+    );
+END;
+GO
+
+-- SET NULL
+IF OBJECT_ID('dbo.ChildTableWithSetNull', 'U') IS NULL
+BEGIN
+    CREATE TABLE dbo.ChildTableWithSetNull
+    (
+        ChildID INT PRIMARY KEY IDENTITY(1,1),
+        ParentID INT NULL,
+        Description NVARCHAR(200),
+        CONSTRAINT FK_ParentChildWithSetNull FOREIGN KEY (ParentID) 
+        REFERENCES dbo.ParentTable(ParentID) ON DELETE SET NULL ON UPDATE NO ACTION
+    );
+END;
+GO
+
+-- SET DEFAULT
+IF OBJECT_ID('dbo.ChildTableWithSetDefault', 'U') IS NULL
+BEGIN
+    CREATE TABLE dbo.ChildTableWithSetDefault
+    (
+        ChildID INT PRIMARY KEY IDENTITY(1,1),
+        ParentID INT DEFAULT 1,
+        Description NVARCHAR(200),
+        CONSTRAINT FK_ParentChildWithSetDefault FOREIGN KEY (ParentID) 
+        REFERENCES dbo.ParentTable(ParentID) ON DELETE SET DEFAULT ON UPDATE NO ACTION
+    );
+END;
+GO
+
+-- Проверка 
