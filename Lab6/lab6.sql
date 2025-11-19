@@ -188,11 +188,17 @@ VALUES
 GO
 SELECT SCOPE_IDENTITY() AS LastInsertedID;
 
+SELECT *
+FROM dbo.AIRCRAFT;
+
 INSERT INTO dbo.FLIGHT
     (FlightNumber, FlightDate, Airline, DepartureAirport, ArrivalAirport, BoardingTime, DepartureTime, ArrivalTime, Status, AircraftID)
 VALUES
     ('KL123', '2025-11-20', 'KL', 'AMS', 'BCN', '2025-11-20T07:15:00', '2025-11-20T08:00:00', '2025-11-20T10:45:00', 3, 1)
 GO
+
+SELECT *
+FROM dbo.FLIGHT;
 
 INSERT INTO dbo.CREW
     (LicenseNumber, FirstName, LatName, Gender, Position, FlyingHours, LicenseExpiryDate)
@@ -200,11 +206,17 @@ VALUES
     ('EST-PIL-00123', N'Ivan', N'Petrov', 1, 1, 3560.75, '2028-06-30')
 GO
 
+SELECT *
+FROM dbo.CREW
+
 INSERT INTO dbo.ParentTable
     (ParentName)
 VALUES
     ('Name for Parent');
 GO
+
+SELECT *
+FROM dbo.ParentTable;
 
 INSERT INTO dbo.ChildTableWithNoAction
     (ParentID, Description)
@@ -212,11 +224,17 @@ VALUES
     (1, 'Description for NoAction Child');
 GO
 
+SELECT *
+FROM dbo.ChildTableWithNoAction;
+
 INSERT INTO dbo.ChildTableWithCascade
     (ParentID, Description)
 VALUES
     (1, 'Description for Cascade Child');
 GO
+
+SELECT *
+FROM dbo.ChildTableWithCascade;
 
 INSERT INTO dbo.ChildTableWithSetNull
     (ParentID, Description)
@@ -224,26 +242,15 @@ VALUES
     (1, 'Description for SetNull Child');
 GO
 
+SELECT *
+FROM dbo.ChildTableWithSetNull;
+
 INSERT INTO dbo.ChildTableWithSetDefault
     (ParentID, Description)
 VALUES
     (1, 'Description for SetDefault Child');
 GO
 
-SELECT *
-FROM dbo.AIRCRAFT;
-SELECT *
-FROM dbo.FLIGHT;
-SELECT *
-FROM dbo.CREW;
-SELECT *
-FROM dbo.ParentTable;
-SELECT *
-FROM dbo.ChildTableWithNoAction;
-SELECT *
-FROM dbo.ChildTableWithCascade;
-SELECT *
-FROM dbo.ChildTableWithSetNull;
 SELECT *
 FROM dbo.ChildTableWithSetDefault;
 GO
