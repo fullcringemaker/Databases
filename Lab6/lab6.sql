@@ -15,7 +15,7 @@ GO
 
 CREATE DATABASE Lab6
 ON ( NAME = Lab6_dat,
-    FILENAME = 'D:\database\lab6\Lab6_log.mdf', 
+    FILENAME = 'D:\database\lab6\Lab6_dat.mdf', 
     SIZE = 10MB,
     MAXSIZE = UNLIMITED, 
     FILEGROWTH = 5%
