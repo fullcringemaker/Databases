@@ -5,16 +5,12 @@ GO
 IF DB_ID(N'Lab6') IS NOT NULL
 BEGIN
     DROP DATABASE Lab6;
-    PRINT 'Existing database Lab6 has been deleted';
-END
-ELSE
-BEGIN
-    PRINT 'Database Lab6 not found';
 END
 GO
 
 CREATE DATABASE Lab6
-ON ( NAME = Lab6_dat,
+ON PRIMARY(
+    NAME = Lab6_dat,
     FILENAME = 'D:\database\lab6\Lab6_dat.mdf', 
     SIZE = 10MB,
     MAXSIZE = UNLIMITED, 
@@ -109,148 +105,7 @@ END;
 GO
 
 -- Task 5:
-IF OBJECT_ID('dbo.ParentTable', 'U') IS NULL
-BEGIN
-    CREATE TABLE dbo.ParentTable
-    (
-        ParentID INT PRIMARY KEY IDENTITY(1,1),
-        ParentName NVARCHAR(100) NOT NULL
-    );
-END;
-GO
 
--- NO ACTION
-IF OBJECT_ID('dbo.ChildTableWithNoAction', 'U') IS NULL
-BEGIN
-    CREATE TABLE dbo.ChildTableWithNoAction
-    (
-        ChildID INT PRIMARY KEY IDENTITY(1,1),
-        ParentID INT,
-        Description NVARCHAR(200),
-        CONSTRAINT FK_ParentChildWithNoAction FOREIGN KEY (ParentID) 
-        REFERENCES dbo.ParentTable(ParentID) ON DELETE NO ACTION ON UPDATE NO ACTION
-    );
-END;
-GO
-
--- CASCADE
-IF OBJECT_ID('dbo.ChildTableWithCascade', 'U') IS NULL
-BEGIN
-    CREATE TABLE dbo.ChildTableWithCascade
-    (
-        ChildID INT PRIMARY KEY IDENTITY(1,1),
-        ParentID INT,
-        Description NVARCHAR(200),
-        CONSTRAINT FK_ParentChildWithCascade FOREIGN KEY (ParentID) 
-        REFERENCES dbo.ParentTable(ParentID) ON DELETE CASCADE ON UPDATE NO ACTION
-    );
-END;
-GO
-
--- SET NULL
-IF OBJECT_ID('dbo.ChildTableWithSetNull', 'U') IS NULL
-BEGIN
-    CREATE TABLE dbo.ChildTableWithSetNull
-    (
-        ChildID INT PRIMARY KEY IDENTITY(1,1),
-        ParentID INT NULL,
-        Description NVARCHAR(200),
-        CONSTRAINT FK_ParentChildWithSetNull FOREIGN KEY (ParentID) 
-        REFERENCES dbo.ParentTable(ParentID) ON DELETE SET NULL ON UPDATE NO ACTION
-    );
-END;
-GO
-
--- SET DEFAULT
-IF OBJECT_ID('dbo.ChildTableWithSetDefault', 'U') IS NULL
-BEGIN
-    CREATE TABLE dbo.ChildTableWithSetDefault
-    (
-        ChildID INT PRIMARY KEY IDENTITY(1,1),
-        ParentID INT DEFAULT 1,
-        Description NVARCHAR(200),
-        CONSTRAINT FK_ParentChildWithSetDefault FOREIGN KEY (ParentID) 
-        REFERENCES dbo.ParentTable(ParentID) ON DELETE SET DEFAULT ON UPDATE NO ACTION
-    );
-END;
-GO
-
--- Проверка 
-INSERT INTO dbo.AIRCRAFT
-    (BoardNumber, Model, Manufacturer, PassengerCapacity, LoadCapacity, AircraftAge, Status)
-VALUES
-    ('N123AA', 'A320neo', N'Airbus', 180, 9000.00, 3, 1);
-GO
-INSERT INTO dbo.AIRCRAFT
-    (BoardNumber, Model, Manufacturer, PassengerCapacity, LoadCapacity, AircraftAge, Status)
-VALUES
-    ('N123AB', 'A320neo', N'Airbus', 180, 9000.00, 3, 1);
-GO
-SELECT SCOPE_IDENTITY() AS LastInsertedID;
-
-SELECT *
-FROM dbo.AIRCRAFT;
-
-INSERT INTO dbo.FLIGHT
-    (FlightNumber, FlightDate, Airline, DepartureAirport, ArrivalAirport, BoardingTime, DepartureTime, ArrivalTime, Status, AircraftID)
-VALUES
-    ('KL123', '2025-11-20', 'KL', 'AMS', 'BCN', '2025-11-20T07:15:00', '2025-11-20T08:00:00', '2025-11-20T10:45:00', 3, 1)
-GO
-
-SELECT *
-FROM dbo.FLIGHT;
-
-INSERT INTO dbo.CREW
-    (LicenseNumber, FirstName, LatName, Gender, Position, FlyingHours, LicenseExpiryDate)
-VALUES
-    ('EST-PIL-00123', N'Ivan', N'Petrov', 1, 1, 3560.75, '2028-06-30')
-GO
 
 SELECT *
 FROM dbo.CREW
-
-INSERT INTO dbo.ParentTable
-    (ParentName)
-VALUES
-    ('Name for Parent');
-GO
-
-SELECT *
-FROM dbo.ParentTable;
-
-INSERT INTO dbo.ChildTableWithNoAction
-    (ParentID, Description)
-VALUES
-    (1, 'Description for NoAction Child');
-GO
-
-SELECT *
-FROM dbo.ChildTableWithNoAction;
-
-INSERT INTO dbo.ChildTableWithCascade
-    (ParentID, Description)
-VALUES
-    (1, 'Description for Cascade Child');
-GO
-
-SELECT *
-FROM dbo.ChildTableWithCascade;
-
-INSERT INTO dbo.ChildTableWithSetNull
-    (ParentID, Description)
-VALUES
-    (1, 'Description for SetNull Child');
-GO
-
-SELECT *
-FROM dbo.ChildTableWithSetNull;
-
-INSERT INTO dbo.ChildTableWithSetDefault
-    (ParentID, Description)
-VALUES
-    (1, 'Description for SetDefault Child');
-GO
-
-SELECT *
-FROM dbo.ChildTableWithSetDefault;
-GO
