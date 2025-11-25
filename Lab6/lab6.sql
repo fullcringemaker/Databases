@@ -4,6 +4,7 @@ GO
 
 IF DB_ID(N'Lab6') IS NOT NULL
 BEGIN
+    ALTER DATABASE Lab6 SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
     DROP DATABASE Lab6;
 END
 GO
@@ -32,34 +33,45 @@ IF OBJECT_ID('dbo.AIRCRAFT', 'U') IS NULL
 BEGIN
     CREATE TABLE dbo.AIRCRAFT
     (
-        AircraftID INT PRIMARY KEY IDENTITY(1,1),
+        AircraftID INT NOT NULL PRIMARY KEY IDENTITY(1,1),
         BoardNumber VARCHAR(8) NOT NULL,
         Model NVARCHAR(10) NOT NULL,
         Manufacturer NVARCHAR(20) NOT NULL,
         PassengerCapacity SMALLINT NOT NULL,
         LoadCapacity NUMERIC(6,2) NOT NULL,
         AircraftAge TINYINT NOT NULL,
-        Status TINYINT NOT NULL,
-        CONSTRAINT AK_BoardNumber UNIQUE (BoardNumber)
+        Status TINYINT NOT NULL DEFAULT (1) CHECK (Status IN (1, 2)),
+        CONSTRAINT AK_BoardNumber UNIQUE (BoardNumber),
     );
 END;
 GO
+
+INSERT INTO dbo.AIRCRAFT
+    (BoardNumber, Model, Manufacturer, PassengerCapacity, LoadCapacity, AircraftAge, Status)
+VALUES
+    ('N123AA', 'A320', N'Airbus', 200, 7000.00, 5, 2),
+    ('N123AB', 'A320neo', N'Airbus', 180, 9000.00, 3, 1);
+GO
+
+SELECT * FROM AIRCRAFT;
+
+SELECT IDENT_CURRENT('AIRCRAFT') AS CurrentIdentity;
 
 -- Task 2:
 IF OBJECT_ID('dbo.FLIGHT', 'U') IS NULL
 BEGIN
     CREATE TABLE dbo.FLIGHT
     (
-        FlightID INT PRIMARY KEY IDENTITY(1,1),
-        FlightNumber VARCHAR(5) NOT NULL,
-        FlightDate Date NOT NULL,
-        Airline CHAR(2) NOT NULL,
+        FlightID INT NOT NULL PRIMARY KEY IDENTITY(1,1),      
+        FlightNumber VARCHAR(5) NOT NULL,         
+        FlightDate Date NOT NULL,        
+        Airline CHAR(2) NOT NULL,        
         DepartureAirport CHAR(3) NOT NULL,
         ArrivalAirport CHAR(3) NOT NULL,
         BoardingTime DATETIME NOT NULL,
         DepartureTime DATETIME NOT NULL,
         ArrivalTime DATETIME NOT NULL,
-        Status TINYINT NOT NULL DEFAULT 1 CHECK(Status > 0 AND Status < 6),
+        Status TINYINT NOT NULL DEFAULT 1 CHECK (Status IN (1, 2, 3, 4, 5)),  
         AircraftID INT NOT NULL,
         CONSTRAINT AK_Flight UNIQUE (FlightNumber, FlightDate),
         CONSTRAINT FK_AircraftID FOREIGN KEY (AircraftID) REFERENCES dbo.AIRCRAFT(AircraftID)
@@ -67,45 +79,82 @@ BEGIN
 END;
 GO
 
+INSERT INTO dbo.FLIGHT
+    (FlightNumber, FlightDate, Airline, DepartureAirport, ArrivalAirport, BoardingTime, DepartureTime, ArrivalTime, Status, AircraftID)
+VALUES
+    ('KL120', '2025-11-20', 'KL', 'AMS', 'BCN', '2025-11-20T07:15:00', '2025-11-20T08:00:00', '2025-11-20T10:45:00', 2, 1)
+GO
+
+INSERT INTO dbo.FLIGHT
+    (FlightNumber, FlightDate, Airline, DepartureAirport, ArrivalAirport, BoardingTime, DepartureTime, ArrivalTime, AircraftID)
+VALUES
+    ('KL121', '2025-11-21', 'KL', 'AMS', 'BCN', '2025-11-20T07:15:00', '2025-11-20T08:00:00', '2025-11-20T10:45:00', 1)
+GO
+
+SELECT * FROM dbo.FLIGHT;
+
 -- Task 3:
-IF OBJECT_ID('dbo.CrewGUID', 'U') IS NULL
-BEGIN
-    CREATE TABLE dbo.CrewGUID
-    (
-        CrewGUID UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
-        FirstName NVARCHAR(30),
-        LatName NVARCHAR(30),
-        Gender TINYINT,
-        Position TINYINT,
-        FlyingHours DECIMAL(6,2),
-        LicenseExpiryDate DATE
-    );
-END;
-GO
-
--- Task 4:
-IF OBJECT_ID('dbo.SeqCrewID', 'SO') IS NULL
-    CREATE SEQUENCE dbo.SeqCrewID AS INT START WITH 1 INCREMENT BY 1;
-GO
-
 IF OBJECT_ID('dbo.CREW', 'U') IS NULL
 BEGIN
     CREATE TABLE dbo.CREW
     (
-        CrewID INT PRIMARY KEY DEFAULT NEXT VALUE FOR dbo.SeqCrewID,
-        LicenseNumber VARCHAR(15) UNIQUE NOT NULL,
+        CrewID UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
+        LicenseNumber VARCHAR(15) NOT NULL,    
         FirstName NVARCHAR(30) NOT NULL,
-        LatName NVARCHAR(30) NOT NULL,
-        Gender TINYINT NOT NULL,
-        Position TINYINT NOT NULL,
-        FlyingHours DECIMAL(6,2) NOT NULL,
-        LicenseExpiryDate DATE Not NULL
+        LastName  NVARCHAR(30) NOT NULL,
+        Gender TINYINT NOT NULL CHECK (Gender IN (1, 2)),
+        Position TINYINT NOT NULL CHECK (Position IN (1, 2, 3, 4)),
+        FlyingHours DECIMAL(6,2) NOT NULL CHECK (FlyingHours >= 0),
+        LicenseExpiryDate DATE NOT NULL,
+        CONSTRAINT AK_LicenseNumber UNIQUE (LicenseNumber),
     );
 END;
 GO
 
+INSERT INTO dbo.CREW
+    (LicenseNumber, FirstName, LastName, Gender, Position, FlyingHours, LicenseExpiryDate)
+VALUES
+    ('RU-ATPL-001',  N'Алексей',  N'Иванов',   1, 1,  8500.50, '2029-03-15'),
+    ('RU-CPL-045',   N'Мария',    N'Петрова',  2, 2,  3200.75, '2027-11-20');
+GO
+
+SELECT * FROM dbo.CREW
+
+-- Task 4:
+IF OBJECT_ID('dbo.SeqPassengerID', 'SO') IS NULL
+    CREATE SEQUENCE dbo.SeqPassengerID AS INT START WITH 1 INCREMENT BY 1;
+GO
+
+IF OBJECT_ID('dbo.PASSENGER', 'U') IS NULL
+BEGIN
+    CREATE TABLE dbo.PASSENGER
+    (
+        PassengerID INT PRIMARY KEY DEFAULT NEXT VALUE FOR dbo.SeqPassengerID,
+        DocumentNumber VARCHAR(14) NOT NULL,       
+        FirstName NVARCHAR(30) NOT NULL,
+        LastName NVARCHAR(30) NOT NULL,
+        DateOfBirth DATE NOT NULL,
+        Gender TINYINT NOT NULL CHECK (Gender IN (1,2)),      
+        Citizenship CHAR(3) NOT NULL,
+        CONSTRAINT AK_DocumentNumber UNIQUE (DocumentNumber),
+    );;
+END;
+GO
+
+INSERT INTO dbo.PASSENGER
+    (DocumentNumber, FirstName, LastName, DateOfBirth, Gender, Citizenship)
+VALUES
+    ('45 12 345678', N'Алексей',  N'Иванов',   '1990-03-15', 1, 'RUS'),
+    ('40 09 112233', N'Мария',    N'Петрова',  '1995-11-20', 2, 'RUS');
+GO
+
+INSERT INTO dbo.PASSENGER
+    (PassengerID, DocumentNumber, FirstName, LastName, DateOfBirth, Gender, Citizenship)
+VALUES
+    (NEXT VALUE FOR dbo.SeqPassengerID, '45001234567894', N'Дмитрий',  N'Смирнов',  '1988-07-02', 1, 'BLR');
+GO
+
+SELECT * FROM dbo.PASSENGER;
+GO
+
 -- Task 5:
-
-
-SELECT *
-FROM dbo.CREW
