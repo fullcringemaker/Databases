@@ -137,7 +137,7 @@ BEGIN
         Gender TINYINT NOT NULL CHECK (Gender IN (1,2)),      
         Citizenship CHAR(3) NOT NULL,
         CONSTRAINT AK_DocumentNumber UNIQUE (DocumentNumber),
-    );;
+    );
 END;
 GO
 
@@ -158,3 +158,165 @@ SELECT * FROM dbo.PASSENGER;
 GO
 
 -- Task 5:
+-- NO ACTION
+CREATE TABLE dbo.parent_noaction
+(
+    ParentID INT PRIMARY KEY,
+    ParentName NVARCHAR(50) NOT NULL
+);
+GO
+
+CREATE TABLE dbo.child_noaction
+(
+    ChildID INT PRIMARY KEY,
+    ParentID INT NOT NULL,
+    ChildName NVARCHAR(50) NOT NULL,
+    CONSTRAINT FK_child_noaction_parent FOREIGN KEY (ParentID) REFERENCES dbo.parent_noaction(ParentID)
+        ON DELETE NO ACTION
+        ON UPDATE NO ACTION
+);
+GO
+
+INSERT INTO dbo.parent_noaction (ParentID, ParentName)
+VALUES 
+    (1, N'Родитель 1'), 
+    (2, N'Родитель 2');
+GO
+
+INSERT INTO dbo.child_noaction (ChildID, ParentID, ChildName)
+VALUES 
+    (10, 1, N'Ребёнок A'),
+    (11, 2, N'Ребёнок B');
+GO
+
+SELECT * FROM dbo.child_noaction;
+GO
+
+DELETE FROM dbo.child_noaction WHERE ParentID = 1;
+DELETE FROM dbo.parent_noaction WHERE ParentID = 1;
+GO
+
+SELECT * FROM dbo.child_noaction;
+GO
+
+-- CASCADE
+CREATE TABLE dbo.parent_cascade
+(
+    ParentID INT PRIMARY KEY,
+    ParentName NVARCHAR(50) NOT NULL
+);
+GO
+
+CREATE TABLE dbo.child_cascade
+(
+    ChildID INT PRIMARY KEY,
+    ParentID INT NOT NULL,
+    ChildName NVARCHAR(50) NOT NULL,
+    CONSTRAINT FK_child_cascade_parent FOREIGN KEY (ParentID) REFERENCES dbo.parent_cascade(ParentID)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+GO
+
+INSERT INTO dbo.parent_cascade (ParentID, ParentName)
+VALUES 
+    (1, N'Родитель 1'), 
+    (2, N'Родитель 2');
+
+INSERT INTO dbo.child_cascade (ChildID, ParentID, ChildName)
+VALUES 
+    (20, 1, N'Ребёнок A'), 
+    (21, 1, N'Ребёнок B'),
+    (22, 2, N'Ребёнок C');
+GO
+
+SELECT * FROM dbo.child_cascade;
+GO
+
+DELETE FROM dbo.parent_cascade WHERE ParentID = 1;
+GO
+
+SELECT * FROM dbo.child_cascade;   
+GO
+
+-- SET NULL
+CREATE TABLE dbo.parent_setnull
+(
+    ParentID INT PRIMARY KEY,
+    ParentName NVARCHAR(50) NOT NULL
+);
+GO
+
+CREATE TABLE dbo.child_setnull
+(
+    ChildID INT PRIMARY KEY,
+    ParentID INT NULL,         
+    ChildName NVARCHAR(50) NOT NULL,
+    CONSTRAINT FK_child_setnull_parent FOREIGN KEY (ParentID) REFERENCES dbo.parent_setnull(ParentID)
+        ON DELETE SET NULL
+        ON UPDATE SET NULL
+);
+GO
+
+INSERT INTO dbo.parent_setnull (ParentID, ParentName)
+VALUES 
+    (1, N'Родитель 1'),
+    (2, N'Родитель 2');
+
+INSERT INTO dbo.child_setnull (ChildID, ParentID, ChildName)
+VALUES 
+    (30, 1, N'Ребёнок A'),
+    (31, 2, N'Ребёнок B'),
+    (32, NULL, N'Ребёнок без родителя');
+GO
+
+SELECT * FROM dbo.child_setnull;
+GO
+
+DELETE FROM dbo.parent_setnull WHERE ParentID = 1;
+GO
+ 
+SELECT * FROM dbo.child_setnull;
+GO
+
+-- SET DEFAULT
+CREATE TABLE dbo.parent_setdefault
+(
+    ParentID INT PRIMARY KEY,
+    ParentName NVARCHAR(50) NOT NULL
+);
+GO
+
+INSERT INTO dbo.parent_setdefault (ParentID, ParentName)
+VALUES 
+    (0, N'Родитель 1'), 
+    (1, N'Родитель 2');
+GO
+
+CREATE TABLE dbo.child_setdefault
+(
+    ChildID INT PRIMARY KEY,
+    ParentID INT NOT NULL DEFAULT 0,
+    ChildName NVARCHAR(50) NOT NULL,
+    CONSTRAINT FK_child_setdefault_parent FOREIGN KEY (ParentID) REFERENCES dbo.parent_setdefault(ParentID)
+        ON DELETE SET DEFAULT
+        ON UPDATE SET DEFAULT
+);
+GO
+
+INSERT INTO dbo.child_setdefault (ChildID, ParentID, ChildName)
+VALUES 
+    (40, 1, N'Ребёнок A'),
+    (41, 1, N'Ребёнок B'),
+    (42, 0, N'Ребёнок C');
+GO
+
+SELECT * FROM dbo.child_setdefault;
+GO
+
+DELETE FROM dbo.parent_setdefault WHERE ParentID = 1;
+GO
+  
+SELECT * FROM dbo.child_setdefault;
+GO
+
