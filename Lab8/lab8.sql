@@ -52,12 +52,11 @@ INSERT INTO dbo.AIRCRAFT
     (BoardNumber, Model, Manufacturer, PassengerCapacity, LoadCapacity, AircraftAge, Status)
 VALUES
     ('F-GKXM',  N'A320neo',   N'Airbus', 180, 7400.50,  3, 1),  
-    ('D-ABCD',  N'B737-8',    N'Boeing', 189, 7600.00,  7, 1), 
-    ('G-EZUA',  N'A321-200',  N'Airbus', 220, 8200.25, 10, 1),  
+    ('D-ABCD',  N'B737-8',    N'Boeing', 220, 7600.00,  7, 1), 
+    ('G-EZUA',  N'A321-200',  N'Airbus', 189, 8200.25, 10, 1),  
     ('N123AB',  N'B787-8',    N'Boeing', 242, 9800.00,  2, 2),  
     ('EI-GSH',  N'SSJ100',    N'Sukhoi',  98, 6400.00,  6, 1);
 GO
-
 
 -- Task 1:
 DROP PROCEDURE IF EXISTS dbo.GetAircraftByPassengerCapacity;
@@ -81,6 +80,7 @@ BEGIN
     FROM dbo.AIRCRAFT
     WHERE PassengerCapacity >= @MinPassengerCapacity;
     OPEN @cursor;
+    -- fetch
 END;
 GO
 
@@ -179,7 +179,6 @@ GO
 
 -- Тест для Task 2:
 DECLARE @cursor2 CURSOR;
-
 DECLARE 
     @AircraftID         INT,
     @BoardNumber        VARCHAR(8),
@@ -189,11 +188,9 @@ DECLARE
     @LoadCapacity       NUMERIC(6,2),
     @AircraftAge        TINYINT,
     @StatusDescription  NVARCHAR(30);
-
 EXEC dbo.GetAircraftByMinCapacityWithStatus
      @cursor = @cursor2 OUTPUT,
-     @MinPassengerCapacity = 180;  -- можно менять для проверки
-
+     @MinPassengerCapacity = 180;
 FETCH NEXT FROM @cursor2
 INTO
     @AircraftID,
@@ -204,7 +201,6 @@ INTO
     @LoadCapacity,
     @AircraftAge,
     @StatusDescription;
-
 WHILE @@FETCH_STATUS = 0
 BEGIN
     SELECT
@@ -216,7 +212,6 @@ BEGIN
         @LoadCapacity       AS LoadCapacity,
         @AircraftAge        AS AircraftAge,
         @StatusDescription  AS StatusDescription;
-
     FETCH NEXT FROM @cursor2
     INTO
         @AircraftID,
@@ -314,21 +309,15 @@ GO
 DROP FUNCTION IF EXISTS dbo.FilteredAircraftWithStatus;
 GO
 
+DROP FUNCTION IF EXISTS dbo.FilteredAircraftWithStatus;
+GO
+
+-- краткая версия функции
 CREATE FUNCTION dbo.FilteredAircraftWithStatus()
-RETURNS @ResultTable TABLE
-(
-    AircraftID        INT,
-    BoardNumber       VARCHAR(8),
-    Model             NVARCHAR(10),
-    Manufacturer      NVARCHAR(20),
-    PassengerCapacity SMALLINT,
-    LoadCapacity      NUMERIC(6,2),
-    AircraftAge       TINYINT,
-    StatusDescription NVARCHAR(30)
-)
+RETURNS TABLE
 AS
-BEGIN
-    INSERT INTO @ResultTable
+RETURN
+(
     SELECT
         AircraftID,
         BoardNumber,
@@ -339,11 +328,40 @@ BEGIN
         AircraftAge,
         dbo.GetStatusDescription(Status) AS StatusDescription
     FROM dbo.AIRCRAFT
-    WHERE PassengerCapacity >= 180;
-
-    RETURN;
-END;
+    WHERE PassengerCapacity >= 180
+);
 GO
+
+-- Полная версия функцияя
+-- CREATE FUNCTION dbo.FilteredAircraftWithStatus()
+-- RETURNS @ResultTable TABLE
+-- (
+--     AircraftID        INT,
+--     BoardNumber       VARCHAR(8),
+--     Model             NVARCHAR(10),
+--     Manufacturer      NVARCHAR(20),
+--     PassengerCapacity SMALLINT,
+--     LoadCapacity      NUMERIC(6,2),
+--     AircraftAge       TINYINT,
+--     StatusDescription NVARCHAR(30)
+-- )
+-- AS
+-- BEGIN
+--     INSERT INTO @ResultTable
+--     SELECT
+--         AircraftID,
+--         BoardNumber,
+--         Model,
+--         Manufacturer,
+--         PassengerCapacity,
+--         LoadCapacity,
+--         AircraftAge,
+--         dbo.GetStatusDescription(Status) AS StatusDescription
+--     FROM dbo.AIRCRAFT
+--     WHERE PassengerCapacity >= 180;
+--     RETURN;
+-- END;
+-- GO
 
 DROP PROCEDURE IF EXISTS dbo.UseFilteredAircraftWithStatus;
 GO
@@ -351,8 +369,7 @@ GO
 CREATE PROCEDURE dbo.UseFilteredAircraftWithStatus
 AS
 BEGIN
-    SELECT *
-    FROM dbo.FilteredAircraftWithStatus();
+    SELECT * FROM dbo.FilteredAircraftWithStatus();
 END;
 GO
 
