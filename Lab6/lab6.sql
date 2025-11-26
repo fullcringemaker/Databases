@@ -55,7 +55,7 @@ GO
 
 SELECT * FROM AIRCRAFT;
 
-SELECT IDENT_CURRENT('AIRCRAFT') AS CurrentIdentity;
+SELECT SCOPE_IDENTITY() AS ScopeIdentity;
 
 -- Task 2:
 IF OBJECT_ID('dbo.FLIGHT', 'U') IS NULL
@@ -64,7 +64,7 @@ BEGIN
     (
         FlightID INT NOT NULL PRIMARY KEY IDENTITY(1,1),      
         FlightNumber VARCHAR(5) NOT NULL,         
-        FlightDate Date NOT NULL,        
+        FlightDate DATE NOT NULL DEFAULT (SYSDATETIME()),        
         Airline CHAR(2) NOT NULL,        
         DepartureAirport CHAR(3) NOT NULL,
         ArrivalAirport CHAR(3) NOT NULL,
@@ -80,9 +80,9 @@ END;
 GO
 
 INSERT INTO dbo.FLIGHT
-    (FlightNumber, FlightDate, Airline, DepartureAirport, ArrivalAirport, BoardingTime, DepartureTime, ArrivalTime, Status, AircraftID)
+    (FlightNumber, Airline, DepartureAirport, ArrivalAirport, BoardingTime, DepartureTime, ArrivalTime, Status, AircraftID)
 VALUES
-    ('KL120', '2025-11-20', 'KL', 'AMS', 'BCN', '2025-11-20T07:15:00', '2025-11-20T08:00:00', '2025-11-20T10:45:00', 2, 1)
+    ('KL120', 'KL', 'AMS', 'BCN', '2025-11-20T07:15:00', '2025-11-20T08:00:00', '2025-11-20T10:45:00', 2, 1)
 GO
 
 INSERT INTO dbo.FLIGHT
@@ -145,13 +145,8 @@ INSERT INTO dbo.PASSENGER
     (DocumentNumber, FirstName, LastName, DateOfBirth, Gender, Citizenship)
 VALUES
     ('45 12 345678', N'Алексей',  N'Иванов',   '1990-03-15', 1, 'RUS'),
-    ('40 09 112233', N'Мария',    N'Петрова',  '1995-11-20', 2, 'RUS');
-GO
-
-INSERT INTO dbo.PASSENGER
-    (PassengerID, DocumentNumber, FirstName, LastName, DateOfBirth, Gender, Citizenship)
-VALUES
-    (NEXT VALUE FOR dbo.SeqPassengerID, '45001234567894', N'Дмитрий',  N'Смирнов',  '1988-07-02', 1, 'BLR');
+    ('40 09 112233', N'Мария',    N'Петрова',  '1995-11-20', 2, 'RUS'),
+    ('45001234567894', N'Дмитрий',  N'Смирнов',  '1988-07-02', 1, 'BLR');
 GO
 
 SELECT * FROM dbo.PASSENGER;
@@ -214,7 +209,7 @@ CREATE TABLE dbo.child_cascade
     ChildName NVARCHAR(50) NOT NULL,
     CONSTRAINT FK_child_cascade_parent FOREIGN KEY (ParentID) REFERENCES dbo.parent_cascade(ParentID)
         ON DELETE CASCADE
-        ON UPDATE CASCADE
+        ON UPDATE NO ACTION
 );
 GO
 
@@ -254,7 +249,7 @@ CREATE TABLE dbo.child_setnull
     ChildName NVARCHAR(50) NOT NULL,
     CONSTRAINT FK_child_setnull_parent FOREIGN KEY (ParentID) REFERENCES dbo.parent_setnull(ParentID)
         ON DELETE SET NULL
-        ON UPDATE SET NULL
+        ON UPDATE NO ACTION
 );
 GO
 
@@ -266,8 +261,7 @@ VALUES
 INSERT INTO dbo.child_setnull (ChildID, ParentID, ChildName)
 VALUES 
     (30, 1, N'Ребёнок A'),
-    (31, 2, N'Ребёнок B'),
-    (32, NULL, N'Ребёнок без родителя');
+    (31, 2, N'Ребёнок B');
 GO
 
 SELECT * FROM dbo.child_setnull;
@@ -290,17 +284,18 @@ GO
 INSERT INTO dbo.parent_setdefault (ParentID, ParentName)
 VALUES 
     (0, N'Родитель 1'), 
-    (1, N'Родитель 2');
+    (1, N'Родитель 2'),
+    (2, N'Родитель 3');
 GO
 
 CREATE TABLE dbo.child_setdefault
 (
     ChildID INT PRIMARY KEY,
-    ParentID INT NOT NULL DEFAULT 0,
+    ParentID INT NOT NULL DEFAULT 2,
     ChildName NVARCHAR(50) NOT NULL,
     CONSTRAINT FK_child_setdefault_parent FOREIGN KEY (ParentID) REFERENCES dbo.parent_setdefault(ParentID)
         ON DELETE SET DEFAULT
-        ON UPDATE SET DEFAULT
+        ON UPDATE NO ACTION
 );
 GO
 
@@ -319,4 +314,3 @@ GO
   
 SELECT * FROM dbo.child_setdefault;
 GO
-
