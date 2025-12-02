@@ -80,7 +80,6 @@ BEGIN
     FROM dbo.AIRCRAFT
     WHERE PassengerCapacity >= @MinPassengerCapacity;
     OPEN @cursor;
-    -- fetch
 END;
 GO
 
