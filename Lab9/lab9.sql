@@ -175,6 +175,7 @@ IF OBJECT_ID(N'Trigger_Insert_view_AIRCRAFTAndTechSpecifications') IS NOT NULL
     DROP TRIGGER Trigger_Insert_view_AIRCRAFTAndTechSpecifications;
 GO
 
+-- Insert
 CREATE TRIGGER Trigger_Insert_view_AIRCRAFTAndTechSpecifications
 ON view_AIRCRAFTAndTechSpecifications
 INSTEAD OF INSERT
@@ -218,6 +219,7 @@ IF OBJECT_ID(N'Trigger_Update_view_AIRCRAFTAndTechSpecifications') IS NOT NULL
     DROP TRIGGER Trigger_Update_view_AIRCRAFTAndTechSpecifications;
 GO
 
+-- Update
 CREATE TRIGGER Trigger_Update_view_AIRCRAFTAndTechSpecifications
 ON view_AIRCRAFTAndTechSpecifications
 INSTEAD OF UPDATE
@@ -283,6 +285,7 @@ IF OBJECT_ID(N'Trigger_Delete_view_AIRCRAFTAndTechSpecifications') IS NOT NULL
     DROP TRIGGER Trigger_Delete_view_AIRCRAFTAndTechSpecifications;
 GO
 
+-- Delete
 CREATE TRIGGER Trigger_Delete_view_AIRCRAFTAndTechSpecifications
 ON view_AIRCRAFTAndTechSpecifications
 INSTEAD OF DELETE
