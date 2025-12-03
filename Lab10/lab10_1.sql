@@ -9,7 +9,7 @@ BEGIN TRANSACTION;
     SELECT *
     FROM AIRCRAFT
     WHERE BoardNumber = 'F-GKXM';
-    WAITFOR DELAY '00:00:07';
+    WAITFOR DELAY '00:00:10';
     SELECT *
     FROM AIRCRAFT
     WHERE BoardNumber = 'F-GKXM';
@@ -24,7 +24,7 @@ BEGIN TRANSACTION;
     SELECT *
     FROM AIRCRAFT
     WHERE BoardNumber = 'D-ABCD';
-    WAITFOR DELAY '00:00:07';
+    WAITFOR DELAY '00:00:10';
     SELECT *
     FROM AIRCRAFT
     WHERE BoardNumber = 'D-ABCD';
@@ -39,7 +39,7 @@ BEGIN TRANSACTION;
     SELECT *
     FROM AIRCRAFT
     WHERE PassengerCapacity > 180;
-    WAITFOR DELAY '00:00:07';
+    WAITFOR DELAY '00:00:10';
     SELECT *
     FROM AIRCRAFT
     WHERE PassengerCapacity > 180;
@@ -54,7 +54,7 @@ BEGIN TRANSACTION;
     SELECT *
     FROM AIRCRAFT
     WHERE PassengerCapacity > 180;
-    WAITFOR DELAY '00:00:07';
+    WAITFOR DELAY '00:00:10';
     SELECT *
     FROM AIRCRAFT
     WHERE PassengerCapacity > 180;
