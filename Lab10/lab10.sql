@@ -28,4 +28,30 @@ GO
 USE Lab10;
 GO
 
---Task 1:
+IF OBJECT_ID(N'AIRCRAFT') IS NOT NULL
+    DROP TABLE AIRCRAFT;
+GO
+
+CREATE TABLE AIRCRAFT
+(
+    AircraftID INT NOT NULL PRIMARY KEY IDENTITY(1,1),
+    BoardNumber VARCHAR(8) NOT NULL,
+    Model NVARCHAR(10) NOT NULL,
+    Manufacturer NVARCHAR(20) NOT NULL,
+    PassengerCapacity SMALLINT NOT NULL,
+    LoadCapacity NUMERIC(6,2) NOT NULL,
+    AircraftAge TINYINT NOT NULL,
+    Status TINYINT NOT NULL DEFAULT (1) CHECK (Status IN (1, 2)),
+    CONSTRAINT AK_BoardNumber UNIQUE (BoardNumber),
+);
+GO
+
+INSERT INTO AIRCRAFT
+    (BoardNumber, Model, Manufacturer, PassengerCapacity, LoadCapacity, AircraftAge, Status)
+VALUES
+    ('F-GKXM',  N'A320neo',   N'Airbus', 180, 7400.50,  3, 1),  
+    ('D-ABCD',  N'B737-8',    N'Boeing', 220, 7600.00,  7, 1), 
+    ('G-EZUA',  N'A321-200',  N'Airbus', 189, 8200.25, 10, 1),  
+    ('N123AB',  N'B787-8',    N'Boeing', 242, 9800.00,  2, 2),  
+    ('EI-GSH',  N'SSJ100',    N'Sukhoi',  98, 6400.00,  6, 1);
+GO
