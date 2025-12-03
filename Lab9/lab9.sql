@@ -227,6 +227,12 @@ ON view_AIRCRAFTAndTechSpecifications
 INSTEAD OF UPDATE
 AS
 BEGIN
+    IF UPDATE(AircraftID)
+    BEGIN
+        RAISERROR(N'Changing AircraftID through this view is not allowed.', 16, 1);
+        ROLLBACK TRANSACTION;
+        RETURN;
+    END;
     IF EXISTS (
         SELECT 1
         FROM inserted
@@ -371,4 +377,4 @@ SELECT * FROM AIRCRAFT;
 GO
 
 SELECT * FROM AircraftTechSpecifications;
-GOv
+GO
