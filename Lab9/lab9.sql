@@ -43,11 +43,11 @@ CREATE TABLE AIRCRAFT
 );
 GO
 
+-- Insert
 IF OBJECT_ID(N'Trigger_Insert_AIRCRAFT') IS NOT NULL 
     DROP TRIGGER Trigger_Insert_AIRCRAFT;
 GO
 
--- Insert
 CREATE TRIGGER Trigger_Insert_AIRCRAFT
 ON AIRCRAFT
 AFTER INSERT
@@ -59,11 +59,11 @@ BEGIN
 END;
 GO
 
+-- Update
 IF OBJECT_ID(N'Trigger_Update_AIRCRAFT') IS NOT NULL 
     DROP TRIGGER Trigger_Update_AIRCRAFT;
 GO
 
--- Update
 CREATE TRIGGER Trigger_Update_AIRCRAFT
 ON AIRCRAFT
 AFTER UPDATE
@@ -85,11 +85,11 @@ BEGIN
 END;
 GO
 
+-- Delete
 IF OBJECT_ID(N'Trigger_Delete_AIRCRAFT') IS NOT NULL 
     DROP TRIGGER Trigger_Delete_AIRCRAFT;
 GO
 
--- Delete
 CREATE TRIGGER Trigger_Delete_AIRCRAFT
 ON AIRCRAFT
 AFTER DELETE
@@ -119,13 +119,15 @@ GO
 SELECT * FROM AIRCRAFT;
 GO
 
---invalid
---UPDATE AIRCRAFT
---SET BoardNumber = 'AA'
---WHERE BoardNumber = 'EFGH5678';
---GO
---SELECT * FROM AIRCRAFT;
---GO
+/*
+invalid
+UPDATE AIRCRAFT
+SET BoardNumber = 'AA'
+WHERE BoardNumber = 'EFGH5678';
+GO
+SELECT * FROM AIRCRAFT;
+GO
+*/
 
 DELETE FROM AIRCRAFT
 WHERE BoardNumber = 'QWER9999';
@@ -171,11 +173,11 @@ AS
             ON a.AircraftID = ts.AircraftID;
 GO
 
+-- Insert
 IF OBJECT_ID(N'Trigger_Insert_view_AIRCRAFTAndTechSpecifications') IS NOT NULL 
     DROP TRIGGER Trigger_Insert_view_AIRCRAFTAndTechSpecifications;
 GO
 
--- Insert
 CREATE TRIGGER Trigger_Insert_view_AIRCRAFTAndTechSpecifications
 ON view_AIRCRAFTAndTechSpecifications
 INSTEAD OF INSERT
@@ -215,11 +217,11 @@ BEGIN
 END;
 GO
 
+-- Update
 IF OBJECT_ID(N'Trigger_Update_view_AIRCRAFTAndTechSpecifications') IS NOT NULL 
     DROP TRIGGER Trigger_Update_view_AIRCRAFTAndTechSpecifications;
 GO
 
--- Update
 CREATE TRIGGER Trigger_Update_view_AIRCRAFTAndTechSpecifications
 ON view_AIRCRAFTAndTechSpecifications
 INSTEAD OF UPDATE
@@ -281,20 +283,20 @@ BEGIN
 END;
 GO
 
+-- Delete
 IF OBJECT_ID(N'Trigger_Delete_view_AIRCRAFTAndTechSpecifications') IS NOT NULL 
     DROP TRIGGER Trigger_Delete_view_AIRCRAFTAndTechSpecifications;
 GO
 
--- Delete
 CREATE TRIGGER Trigger_Delete_view_AIRCRAFTAndTechSpecifications
 ON view_AIRCRAFTAndTechSpecifications
 INSTEAD OF DELETE
 AS
 BEGIN
-    DELETE FROM AircraftTechSpecifications
-    WHERE AircraftID IN (
-    SELECT AircraftID 
-    FROM deleted);
+--  DELETE FROM AircraftTechSpecifications
+--  WHERE AircraftID IN (
+--  SELECT AircraftID 
+--  FROM deleted);
 
     DELETE FROM AIRCRAFT
     WHERE AircraftID IN (
@@ -320,13 +322,15 @@ GO
 SELECT * FROM AircraftTechSpecifications;
 GO
 
---invalid
---INSERT INTO view_AIRCRAFTAndTechSpecifications
---    (BoardNumber, Model, Manufacturer, PassengerCapacity, LoadCapacity, AircraftAge, Status)
---VALUES
---    ('L9000001', 'A330', 'Airbus', 250, 20.00, 4, 1);
---PRINT 'Error (duplicate INSERT): ' + ERROR_MESSAGE();
---GO
+/*
+invalid
+INSERT INTO view_AIRCRAFTAndTechSpecifications
+    (BoardNumber, Model, Manufacturer, PassengerCapacity, LoadCapacity, AircraftAge, Status)
+VALUES
+    ('L9000001', 'A330', 'Airbus', 250, 20.00, 4, 1);
+PRINT 'Error (duplicate INSERT): ' + ERROR_MESSAGE();
+GO
+*/
 
 UPDATE view_AIRCRAFTAndTechSpecifications
 SET 
@@ -345,14 +349,16 @@ GO
 SELECT * FROM AircraftTechSpecifications;
 GO
 
---invalid
---UPDATE view_AIRCRAFTAndTechSpecifications
---SET PassengerCapacity = -10      -- триггер должен выдать RAISERROR
---WHERE BoardNumber = 'B9000002';
---PRINT 'Error (invalid UPDATE): ' + ERROR_MESSAGE();
---GO
---SELECT * FROM AircraftTechSpecifications;
---GO
+/*
+invalid
+UPDATE view_AIRCRAFTAndTechSpecifications
+SET PassengerCapacity = -10
+WHERE BoardNumber = 'B9000002';
+PRINT 'Error (invalid UPDATE): ' + ERROR_MESSAGE();
+GO
+SELECT * FROM AircraftTechSpecifications;
+GO
+*/
 
 DELETE FROM view_AIRCRAFTAndTechSpecifications
 WHERE BoardNumber = 'L9000001';
@@ -365,4 +371,4 @@ SELECT * FROM AIRCRAFT;
 GO
 
 SELECT * FROM AircraftTechSpecifications;
-GO
+GOv
