@@ -151,7 +151,7 @@ CREATE TABLE AircraftTechSpecifications
 GO
 
 IF OBJECT_ID(N'view_AIRCRAFTAndTechSpecifications') IS NOT NULL
-    DROP TABLE view_AIRCRAFTAndTechSpecifications;
+    DROP VIEW view_AIRCRAFTAndTechSpecifications;
 GO
 
 CREATE VIEW view_AIRCRAFTAndTechSpecifications
@@ -351,9 +351,8 @@ GO
 --WHERE BoardNumber = 'B9000002';
 --PRINT 'Error (invalid UPDATE): ' + ERROR_MESSAGE();
 --GO
-
-SELECT * FROM AircraftTechSpecifications;
-GO
+--SELECT * FROM AircraftTechSpecifications;
+--GO
 
 DELETE FROM view_AIRCRAFTAndTechSpecifications
 WHERE BoardNumber = 'L9000001';
