@@ -4,32 +4,31 @@ GO
 
 IF DB_ID(N'Lab5') IS NOT NULL
 BEGIN
+    ALTER DATABASE Lab5 SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
     DROP DATABASE Lab5;
-    PRINT 'The existing Lab5 database has been deleted';
-END
-ELSE
-BEGIN
-    PRINT 'The lab5 database was not found';
 END
 GO
 
--- Task 1:
 CREATE DATABASE Lab5
-ON ( NAME = lab5_dat,
+ON PRIMARY(
+    NAME = Lab5_dat,
     FILENAME = 'D:\database\lab5\Lab5_dat.mdf', 
     SIZE = 10MB,
     MAXSIZE = UNLIMITED, 
-    FILEGROWTH = 5% )
-LOG ON ( NAME = lab5_log,
+    FILEGROWTH = 5%
+)
+LOG ON (NAME = Lab_5log,
     FILENAME = 'D:\database\lab5\Lab5_log.ldf',
     SIZE = 5MB,
     MAXSIZE = 25MB,
-    FILEGROWTH = 5MB );
+    FILEGROWTH = 5MB
+);
 GO
 
 -- Task 2:
 USE Lab5;
 GO
+
 IF OBJECT_ID(N'AIRCRAFT') IS NOT NULL
 BEGIN
     DROP TABLE AIRCRAFT;
