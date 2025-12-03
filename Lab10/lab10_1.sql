@@ -1,0 +1,63 @@
+-- Лабораторная работа 10
+USE Lab10;
+GO
+
+-- Грязное чтение (Dirty Read)
+/*
+SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;
+BEGIN TRANSACTION;
+    SELECT *
+    FROM AIRCRAFT
+    WHERE BoardNumber = 'F-GKXM';
+    WAITFOR DELAY '00:00:07';
+    SELECT *
+    FROM AIRCRAFT
+    WHERE BoardNumber = 'F-GKXM';
+COMMIT TRANSACTION;
+GO
+*/
+
+-- Невоспроизводимое чтение (Non-repeatable Read)
+/*
+SET TRANSACTION ISOLATION LEVEL READ COMMITTED;
+BEGIN TRANSACTION;
+    SELECT *
+    FROM AIRCRAFT
+    WHERE BoardNumber = 'D-ABCD';
+    WAITFOR DELAY '00:00:07';
+    SELECT *
+    FROM AIRCRAFT
+    WHERE BoardNumber = 'D-ABCD';
+COMMIT TRANSACTION;
+GO
+*/
+
+-- Фантомное чтение (Phantom Read)
+/*
+SET TRANSACTION ISOLATION LEVEL REPEATABLE READ;
+BEGIN TRANSACTION;
+    SELECT *
+    FROM AIRCRAFT
+    WHERE PassengerCapacity > 180;
+    WAITFOR DELAY '00:00:07';
+    SELECT *
+    FROM AIRCRAFT
+    WHERE PassengerCapacity > 180;
+COMMIT TRANSACTION;
+GO
+*/
+
+-- Полная изоляция (Serializable)
+/*
+SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+BEGIN TRANSACTION;
+    SELECT *
+    FROM AIRCRAFT
+    WHERE PassengerCapacity > 180;
+    WAITFOR DELAY '00:00:07';
+    SELECT *
+    FROM AIRCRAFT
+    WHERE PassengerCapacity > 180;
+COMMIT TRANSACTION;
+GO
+*/
