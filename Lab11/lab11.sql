@@ -381,3 +381,43 @@ SELECT *
 FROM AIRCRAFT
 GO
 
+-- Таблица PASSENGER
+INSERT INTO PASSENGER
+    (DocumentNumber, FirstName, LastName, DateOfBirth, Gender, Citizenship)
+VALUES
+    ('4010 123456', N'Ivan',   N'Ivanov',  '1990-05-12', 1, 'RUS'),
+    ('4010 654321', N'Anna',   N'Petrova', '1995-09-03', 2, 'RUS'),
+    ('AB987654321', N'John',  N'Smith',    '1988-12-02', 1, 'USA');
+GO
+
+UPDATE PASSENGER
+SET Citizenship = 'GBR'
+WHERE DocumentNumber = 'AB987654321';
+GO
+
+SELECT * FROM PASSENGER
+
+-- Таблица CREW
+INSERT INTO CREW
+    (LicenseNumber, FirstName, LastName, Gender, Position, FlyingHours, LicenseExpiryDate)
+VALUES
+    ('RU-PLT-123456',  N'Aleksei', N'Petrov',      1, 1, 5230.50, '2028-03-15'),
+    ('RU-FO-234567',   N'Sergei',  N'Ilin',        1, 2, 3120.75, '2027-10-01'),
+    ('RU-FA-345678',   N'Olga',    N'Sidorova',    2, 3,  980.25, '2026-06-30'),
+    ('RU-SFA-456789',  N'Maria',   N'Kuznetsova',  2, 4, 1540.00, '2029-01-20'); 
+GO
+
+SELECT * FROM CREW
+
+-- Таблица TICKET
+INSERT INTO TICKET
+    (TicketNumber, Price, BookingDate, SeatNumber, ClassOfService, BaggageWeight, HandLuggageWeight, FlightID, PassengerID)
+SELECT
+    'SU101-000001', 8500, '2025-01-05', '12A', 1, 20.00, 8.00, F.FlightID, P.PassengerID
+FROM FLIGHT F
+CROSS JOIN PASSENGER P
+WHERE F.FlightNumber = 'UT202' AND P.DocumentNumber = '4010 654321'; 
+GO
+
+SELECT * FROM TICKET
+
