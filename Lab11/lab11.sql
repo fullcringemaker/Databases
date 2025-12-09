@@ -562,7 +562,7 @@ GO
 SELECT
     FirstName + ' ' + LastName AS CrewName,
     Position,
-    FlyingHours
+    FlyingHours,
     Gender
 FROM CREW
 WHERE Position IN (1, 2);
@@ -573,7 +573,7 @@ SELECT
     C.FirstName + ' ' + C.LastName AS CrewName,
     C.Position,
     C.FlyingHours,
-    C.LicenseExpiryDate,
+    C.LicenseExpiryDate
 FROM CREW AS C
 WHERE EXISTS (
     SELECT 1
@@ -593,5 +593,4 @@ SELECT
 FROM TICKET
 WHERE BaggageWeight IS NULL;
 GO
-
 
