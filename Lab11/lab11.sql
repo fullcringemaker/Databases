@@ -419,19 +419,31 @@ SELECT * FROM CREW
 INSERT INTO TICKET
     (TicketNumber, Price, BookingDate, SeatNumber, ClassOfService, BaggageWeight, HandLuggageWeight, FlightID, PassengerID)
 SELECT
-    'UT202-000001', 8500, '2025-01-05', '12A', 1, 20.00, 8.00, F.FlightID, P.PassengerID
+    'SU101-000001', 8000, '2025-01-04', '10A', 1, 18.00, 7.00, F.FlightID, P.PassengerID
 FROM FLIGHT F
 CROSS JOIN PASSENGER P
-WHERE F.FlightNumber = 'V' AND P.DocumentNumber = '4010 654321'; 
+WHERE F.FlightNumber   = 'SU101'
+  AND P.DocumentNumber = '4010 123456';
 GO
 
 INSERT INTO TICKET
     (TicketNumber, Price, BookingDate, SeatNumber, ClassOfService, BaggageWeight, HandLuggageWeight, FlightID, PassengerID)
 SELECT
-    'SU102-000002', 8500, '2025-01-05', '12A', 1, 20.00, 8.00, F.FlightID, P.PassengerID
+    'UT202-000001', 8500, '2025-01-05',' 12A', 1, 20.00, 8.00, F.FlightID, P.PassengerID
 FROM FLIGHT F
 CROSS JOIN PASSENGER P
-WHERE F.FlightNumber = 'SU102' AND P.DocumentNumber = 'AB987654321'; 
+WHERE F.FlightNumber   = 'UT202'
+  AND P.DocumentNumber = '4010 654321';
+GO
+
+INSERT INTO TICKET
+    (TicketNumber, Price, BookingDate, SeatNumber, ClassOfService, BaggageWeight, HandLuggageWeight, FlightID, PassengerID)
+SELECT
+    'SU102-000002', 9000, '2025-01-06', '14C', 1, 15.00, 6.00, F.FlightID, P.PassengerID
+FROM FLIGHT F
+CROSS JOIN PASSENGER P
+WHERE F.FlightNumber   = 'SU102'
+  AND P.DocumentNumber = 'AB987654321';
 GO
 
 SELECT * FROM TICKET
