@@ -183,7 +183,7 @@ AS
             ON F.AircraftID = A.AircraftID;
 GO
 
--- Триггер для вставки через представления
+-- Триггер для вставки значений AIRCRAFT и FLIGHT через представления
 IF OBJECT_ID(N'trigger_Insert_AircraftWithFlight', N'TR') IS NOT NULL
     DROP TRIGGER trigger_Insert_AircraftWithFlight;
 GO
@@ -282,7 +282,7 @@ SELECT *
 FROM FLIGHT 
 GO
 
--- Триггер для удаления самолетов из AIRCRAFT
+-- Триггер: удаление самолетов из AIRCRAFT
 IF OBJECT_ID(N'trigger_Delete_Aircraft') IS NOT NULL
     DROP TRIGGER trigger_Delete_Aircraft;
 GO
@@ -323,7 +323,7 @@ DELETE FROM AIRCRAFT
 WHERE BoardNumber = 'RA-89001';
 GO
 
--- Триггер для обновления статуса самолетов из AIRCRAFT
+-- Триггер: обновление статусов самолетов из AIRCRAFT
 IF OBJECT_ID(N'trigger_Update_Aircraft') IS NOT NULL
     DROP TRIGGER trigger_Update_Aircraft;
 GO
@@ -475,13 +475,13 @@ GO
 
 SELECT * FROM FLIGHT_CREW 
 
--- использование DISTINCT для вывода без дублирующихся записей
+-- DISTINCT: для вывода без дублирующихся записей
 SELECT DISTINCT
     Manufacturer
 FROM AIRCRAFT;
 GO
 
--- использование ORDER BY для сортировки от большего к меньшему с помощью DESC
+-- ORDER BY: для сортировки от большего к меньшему с помощью DESC
 SELECT
     FirstName + ' ' + LastName AS FullName,
     Position,
@@ -490,7 +490,7 @@ FROM CREW
 ORDER BY FlyingHours DESC;
 GO
 
--- использование ORDER BY для сортировки от большего к меньшему с помощью ASC
+-- ORDER BY: для сортировки от большего к меньшему с помощью ASC
 SELECT
     FirstName + ' ' + LastName AS FullName,
     DateOfBirth,
@@ -499,7 +499,6 @@ FROM PASSENGER
 ORDER BY DateOfBirth ASC;
 GO
 
---
 -- INNER JOIN: рейсы и задействованные в них самолёты
 SELECT
     F.FlightNumber,
@@ -703,4 +702,51 @@ SELECT
 FROM PASSENGER AS P;
 GO
 
+-- Триггер: пассажиры, у которых после удаления билетов их не осталось, удаляются из PASSENGER
+IF OBJECT_ID(N'trigger_Delete_PassengerWithoutTicket') IS NOT NULL
+    DROP TRIGGER trigger_Delete_PassengerWithoutTicket;
+GO
+
+CREATE TRIGGER trigger_Delete_PassengerWithoutTicket
+ON TICKET
+AFTER DELETE
+AS
+BEGIN
+    -- пассажиры, которых затронуло удаление
+    WITH AffectedPassengers AS (
+        SELECT DISTINCT PassengerID
+        FROM deleted
+        WHERE PassengerID IS NOT NULL
+    )
+    DELETE P
+    FROM PASSENGER AS P
+        JOIN AffectedPassengers AS AP
+            ON P.PassengerID = AP.PassengerID
+    WHERE NOT EXISTS (
+        SELECT 1
+        FROM TICKET AS T
+        WHERE T.PassengerID = P.PassengerID
+    );
+END;
+GO
+
+--DELETE FROM TICKET
+--WHERE TicketNumber = 'SU101-000001';
+--GO
+
+--SELECT
+--    P.PassengerID,
+--    P.FirstName,
+--    P.LastName,
+--    P.DocumentNumber
+--FROM PASSENGER AS P
+--WHERE P.DocumentNumber = '4010 123456';
+
+--SELECT
+--    T.TicketID,
+--    T.TicketNumber,
+--    T.PassengerID
+--FROM TICKET AS T
+--WHERE T.TicketNumber = 'SU101-000001';
+--GO
 
