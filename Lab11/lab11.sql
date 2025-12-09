@@ -264,12 +264,14 @@ INSERT INTO view_AircraftWithFlight
     (BoardNumber, Model, PassengerCapacity, LoadCapacity, AircraftAge, AircraftStatus, Manufacturer,
      FlightNumber, FlightDate, DepartureAirport, ArrivalAirport, BoardingTime, DepartureTime, ArrivalTime, FlightStatus, Airline)
 VALUES
-    ('ABCD1234', 'A320', 180, 2000.00, 5, 1, N'Airbus',
+    ('RA-82001', 'A320', 180, 2000.00, 5, 1, N'Airbus',
      'SU101', '2025-01-10', 'SVO', 'LED', '2025-01-10 07:30', '2025-01-10 08:00', '2025-01-10 09:30', 1, 'SU'),
-    ('ABCD1234', 'A320', 180, 2000.00, 5, 1, N'Airbus',
-     'SU102', '2025-01-11', 'SVO', 'LED', '2025-01-11 07:30', '2025-01-11 08:00', '2025-01-11 09:30', 1, 'SU'),
-    ('EFGH5678', 'B737', 160, 1800.00, 7, 1, N'Boeing',
-     'UT202', '2025-01-11', 'LED', 'DME', '2025-01-11 12:00', '2025-01-11 12:30', '2025-01-11 14:00', 1, 'UT');
+    ('RA-82002', 'A321', 200, 2100.00, 4, 1, N'Airbus',
+     'SU102', '2025-01-11', 'SVO', 'LED', '2025-01-11 09:00', '2025-01-11 09:30', '2025-01-11 11:00', 1, 'SU'),
+    ('VP-B737', 'B737', 160, 1800.00, 7, 1, N'Boeing',
+     'UT202', '2025-01-12', 'LED', 'DME', '2025-01-12 12:00', '2025-01-12 12:30', '2025-01-12 14:00', 1, 'UT'),
+    ('VQ-B781', 'B777', 300, 3000.00, 6, 1, N'Boeing',
+     'DP305', '2025-01-12', 'DME', 'LHR', '2025-01-12 14:00', '2025-01-12 14:40', '2025-01-12 18:30', 1, 'DP');
 GO
 
 SELECT *
@@ -314,11 +316,11 @@ GO
 --WHERE AircraftID = 1;
 
 INSERT INTO AIRCRAFT (BoardNumber, Model, PassengerCapacity, LoadCapacity, AircraftAge, Status, Manufacturer)
-VALUES ('RA12345', 'SSJ-100', 98, 1200.00, 3, 1, N'Иркут');
+VALUES ('RA-89001', 'SSJ-100', 98, 1200.00, 3, 1, N'Иркут');
 GO
 
 DELETE FROM AIRCRAFT
-WHERE BoardNumber = 'RA12345';
+WHERE BoardNumber = 'RA-89001';
 GO
 
 -- Триггер для обновления статуса самолетов из AIRCRAFT
@@ -375,12 +377,12 @@ GO
 --GO
 
 INSERT INTO AIRCRAFT (BoardNumber, Model, PassengerCapacity, LoadCapacity, AircraftAge, Status, Manufacturer)
-VALUES ('RA67890', 'A321', 220, 2100.00, 4, 1, N'Airbus');
+VALUES ('RA-67890', 'A321', 220, 2100.00, 4, 1, N'Airbus');
 GO
 
 UPDATE AIRCRAFT
 SET Status = 2
-WHERE BoardNumber = 'RA67890';
+WHERE BoardNumber = 'RA-67890';
 GO
 
 SELECT *
@@ -391,9 +393,11 @@ GO
 INSERT INTO PASSENGER
     (DocumentNumber, FirstName, LastName, DateOfBirth, Gender, Citizenship)
 VALUES
-    ('4010 123456', N'Ivan',   N'Ivanov',  '2000-05-12', 1, 'RUS'),
-    ('4010 654321', N'Anna',   N'Petrova', '1995-09-03', 2, 'RUS'),
-    ('AB987654321', N'John',  N'Smith',    '1988-12-02', 1, 'USA');
+    ('4010 123456', N'Ivan',   N'Ivanov',   '2000-05-12', 1, 'RUS'),
+    ('4010 654321', N'Anna',   N'Petrova',  '1995-09-03', 2, 'RUS'),
+    ('45 11 789012', N'Aleksei', N'Petrov',  '1992-03-21', 1, 'RUS'),
+    ('AB987654321', N'John',   N'Smith',    '1988-12-02', 1, 'USA'),
+    ('C987654321',  N'Emma',   N'Johnson',  '1999-07-15', 2, 'GBR');
 GO
 
 UPDATE PASSENGER
@@ -407,10 +411,14 @@ SELECT * FROM PASSENGER
 INSERT INTO CREW
     (LicenseNumber, FirstName, LastName, Gender, Position, FlyingHours, LicenseExpiryDate)
 VALUES
-    ('RU-PLT-123456',  N'Aleksei', N'Petrov',      1, 1, 5230.50, '2028-03-15'),
-    ('RU-FO-234567',   N'Sergei',  N'Ilin',        1, 2, 3120.75, '2027-10-01'),
-    ('RU-FA-345678',   N'Olga',    N'Sidorova',    2, 3,  980.25, '2026-06-30'),
-    ('RU-SFA-456789',  N'Maria',   N'Kuznetsova',  2, 4, 1540.00, '2029-01-20'); 
+    ('RU-PLT-111111',  N'Aleksei', N'Petrov',      1, 1, 5230.50, '2028-03-15'),
+    ('RU-PLT-222222',  N'Sergei',  N'Ilin',        1, 1, 4120.75, '2027-10-01'),
+    ('RU-PLT-333333',  N'Ivan',    N'Menshikov',   1, 1, 3890.20, '2029-05-30'), 
+    ('RU-PLT-444444',  N'Maria',   N'Kuznetsova',  2, 1, 4500.00, '2029-11-20'), 
+    ('RU-FO-555555',   N'Dmitrii', N'Sokolov',     1, 2, 2750.00, '2027-04-10'), 
+    ('RU-FA-666666',   N'Olga',    N'Sidorova',    2, 3,  980.25, '2026-06-30'), 
+    ('RU-SFA-777777',  N'Elena',   N'Morozova',    2, 4, 1540.00, '2029-01-20'), 
+    ('RU-FO-888888',   N'Maksim',  N'Voronov',     1, 2, 3100.50, '2028-09-05'); 
 GO
 
 SELECT * FROM CREW
@@ -422,42 +430,47 @@ SELECT
     'SU101-000001', 8000, '2025-01-04', '10A', 1, 18.00, 7.00, F.FlightID, P.PassengerID
 FROM FLIGHT F
 CROSS JOIN PASSENGER P
-WHERE F.FlightNumber   = 'SU101'
-  AND P.DocumentNumber = '4010 123456';
+WHERE F.FlightNumber   = 'SU101'      
+  AND P.DocumentNumber = '4010 123456'; 
 GO
 
 INSERT INTO TICKET
-    (TicketNumber, Price, BookingDate, SeatNumber, ClassOfService, BaggageWeight, HandLuggageWeight, FlightID, PassengerID)
-SELECT
-    'UT202-000001', 8500, '2025-01-05',' 12A', 1, NULL, 8.00, F.FlightID, P.PassengerID
-FROM FLIGHT F
-CROSS JOIN PASSENGER P
-WHERE F.FlightNumber   = 'UT202'
-  AND P.DocumentNumber = '4010 654321';
+    (TicketNumber, Price, BookingDate, SeatNumber, ClassOfService,
+     BaggageWeight, HandLuggageWeight, FlightID, PassengerID)
+VALUES
+    ('SU102-000001', 9000, '2025-01-06', '14A', 1, 20.00, 7.00, 2, 2),
+    ('SU102-000002', 9100, '2025-01-06', '14B', 1, 18.00, 7.00, 2, 3),
+    ('SU102-000003', 9100, '2025-01-07', '15C', 2, NULL, 5.00, 2, 3);
 GO
 
 INSERT INTO TICKET
-    (TicketNumber, Price, BookingDate, SeatNumber, ClassOfService, BaggageWeight, HandLuggageWeight, FlightID, PassengerID)
-SELECT
-    'SU102-000002', 9000, '2025-01-06', '14C', 1, 15.00, 6.00, F.FlightID, P.PassengerID
-FROM FLIGHT F
-CROSS JOIN PASSENGER P
-WHERE F.FlightNumber   = 'SU102'
-  AND P.DocumentNumber = 'AB987654321';
+    (TicketNumber, Price, BookingDate, SeatNumber, ClassOfService,
+     BaggageWeight, HandLuggageWeight, FlightID, PassengerID)
+VALUES
+    ('UT202-000001', 8500, '2025-01-05', '12A', 1, NULL, 8.00, 3, 4),
+    ('UT202-000002', 8600, '2025-01-05', '12B', 2, 15.00, 6.00, 3, 4);
+GO
+
+INSERT INTO TICKET
+    (TicketNumber, Price, BookingDate, SeatNumber, ClassOfService,
+     BaggageWeight, HandLuggageWeight, FlightID, PassengerID)
+VALUES
+    ('DP305-000001', 12000, '2025-01-08', '2C', 1, 23.00, 8.00, 4, 5);
 GO
 
 SELECT * FROM TICKET
 
 -- Таблица FLIGHT_CREW 
 INSERT INTO FLIGHT_CREW (FlightID, CrewID)
-SELECT
-    F.FlightID,
-    C.CrewID
-FROM FLIGHT AS F
-JOIN CREW   AS C
-    ON (F.FlightNumber = 'SU101' AND C.LicenseNumber IN ('RU-PLT-123456', 'RU-FA-345678')) 
-    OR (F.FlightNumber = 'SU102' AND C.LicenseNumber = 'RU-FO-234567')
-    OR (F.FlightNumber = 'UT202' AND C.LicenseNumber = 'RU-SFA-456789');
+VALUES
+    (1, 1),
+    (1, 5),
+    (2, 2), 
+    (2, 6),
+    (3, 3),  
+    (3, 7), 
+    (4, 4),
+    (4, 8);
 GO
 
 SELECT * FROM FLIGHT_CREW 
@@ -598,13 +611,15 @@ GO
 SELECT
     A.BoardNumber,
     A.Model,
+    F.Airline,
     COUNT(F.FlightID) AS FlightCount
 FROM AIRCRAFT AS A
     JOIN FLIGHT AS F
         ON F.AircraftID = A.AircraftID
 GROUP BY
     A.BoardNumber,
-    A.Model;
+    A.Model,
+    F.Airline;
 GO
 
 -- HAVING + COUNT: Авиакомпании, у которых выполнялось более одного рейса
@@ -643,4 +658,49 @@ GROUP BY
     P.LastName,
     P.DocumentNumber;
 GO
+
+-- UNION: список всех людей в системе без повторов.
+SELECT
+    F.DepartureAirport AS AirportCode,
+    'DEPARTURE'        AS AirportRole
+FROM FLIGHT AS F
+UNION
+SELECT
+    F.ArrivalAirport   AS AirportCode,
+    'ARRIVAL'          AS AirportRole
+FROM FLIGHT AS F;
+GO
+
+-- UNION ALL: все аэропорты вылета и прилёта со всех рейсов с сохранением повторов.
+SELECT
+    F.DepartureAirport AS AirportCode,
+    'DEPARTURE'        AS AirportRole
+FROM FLIGHT AS F
+UNION ALL
+SELECT
+    F.ArrivalAirport   AS AirportCode,
+    'ARRIVAL'          AS AirportRole
+FROM FLIGHT AS F;
+GO
+
+-- EXCEPT: имена членов экипажа, которых НЕТ среди пассажиров.
+SELECT
+    C.FirstName + N' ' + C.LastName AS Name
+FROM CREW AS C
+EXCEPT
+SELECT
+    P.FirstName + N' ' + P.LastName AS Name
+FROM PASSENGER AS P;
+GO
+
+-- INTERSECT: имена, которые одновременно встречаются и у пассажиров, и у членов экипажа.
+SELECT
+    C.FirstName + N' ' + C.LastName AS Name
+FROM CREW AS C
+INTERSECT
+SELECT
+    P.FirstName + N' ' + P.LastName AS Name
+FROM PASSENGER AS P;
+GO
+
 
