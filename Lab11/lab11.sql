@@ -64,7 +64,7 @@ CREATE TABLE FLIGHT
     AircraftID INT NOT NULL,
     CONSTRAINT AK_Flight UNIQUE (FlightNumber, FlightDate),
     CONSTRAINT FK_AircraftID FOREIGN KEY (AircraftID) REFERENCES dbo.AIRCRAFT(AircraftID)
-    ON DELETE CASCADE ON UPDATE NO ACTION
+    ON UPDATE NO ACTION
 );
 
 -- Таблица PASSENGER
@@ -136,9 +136,9 @@ CREATE TABLE FLIGHT_CREW
     FlightID INT NOT NULL,
     CrewID   INT NOT NULL,
     CONSTRAINT PK_FLIGHT_CREW PRIMARY KEY (FlightID, CrewID),
-    CONSTRAINT PK_FlightID FOREIGN KEY (FlightID) REFERENCES dbo.FLIGHT (FlightID)
+    CONSTRAINT FK_FLIGHT_CREW_FlightID FOREIGN KEY (FlightID) REFERENCES dbo.FLIGHT (FlightID)
     ON DELETE CASCADE ON UPDATE NO ACTION,
-    CONSTRAINT PK_CrewID FOREIGN KEY (CrewID) REFERENCES dbo.CREW (CrewID)
+    CONSTRAINT FK_FLIGHT_CREW_CrewID FOREIGN KEY (CrewID) REFERENCES dbo.CREW (CrewID)
     ON DELETE CASCADE ON UPDATE NO ACTION
 );
 
@@ -184,11 +184,11 @@ AS
 GO
 
 -- Триггер для вставки через представления
-IF OBJECT_ID(N'trigger_insertAircraftWithFlight', N'TR') IS NOT NULL
-    DROP TRIGGER trigger_insertAircraftWithFlight;
+IF OBJECT_ID(N'trigger_Insert_AircraftWithFlight', N'TR') IS NOT NULL
+    DROP TRIGGER trigger_Insert_AircraftWithFlight;
 GO
 
-CREATE TRIGGER trigger_insert_AircraftWithFlight
+CREATE TRIGGER trigger_Insert_AircraftWithFlight
 ON view_AircraftWithFlight
 INSTEAD OF INSERT
 AS
@@ -204,7 +204,7 @@ BEGIN
             i.AircraftAge,
             i.AircraftStatus,
             i.Manufacturer
-        FROM INSERTED i
+        FROM inserted i
         WHERE i.BoardNumber IS NOT NULL
     )
     -- добавлением уникальных самолетов, где нет повторений в бортовых номерах
@@ -239,7 +239,7 @@ BEGIN
         i.FlightStatus,
         A.AircraftID,
         i.Airline
-    FROM INSERTED i
+    FROM inserted i
         INNER JOIN AIRCRAFT A
             ON A.BoardNumber = i.BoardNumber;
 END;
@@ -281,11 +281,11 @@ FROM FLIGHT
 GO
 
 -- Триггер для удаления самолетов из AIRCRAFT
-IF OBJECT_ID(N'trigger_delete_Aircraft') IS NOT NULL
-    DROP TRIGGER trigger_delete_Aircraft;
+IF OBJECT_ID(N'trigger_Delete_Aircraft') IS NOT NULL
+    DROP TRIGGER trigger_Delete_Aircraft;
 GO
 
-CREATE TRIGGER trigger_delete_Aircraft
+CREATE TRIGGER trigger_Delete_Aircraft
 ON AIRCRAFT
 INSTEAD OF DELETE
 AS
@@ -322,15 +322,21 @@ WHERE BoardNumber = 'RA12345';
 GO
 
 -- Триггер для обновления статуса самолетов из AIRCRAFT
-IF OBJECT_ID(N'trigger_UpdateAircraft') IS NOT NULL
-    DROP TRIGGER trigger_UpdateAircraft;
+IF OBJECT_ID(N'trigger_Update_Aircraft') IS NOT NULL
+    DROP TRIGGER trigger_Update_Aircraft;
 GO
 
-CREATE TRIGGER trigger_UpdateAircraft
+CREATE TRIGGER trigger_Update_Aircraft
 ON AIRCRAFT
 INSTEAD OF UPDATE
 AS
 BEGIN
+    IF UPDATE(AircraftID)
+    BEGIN
+        RAISERROR(N'Нельзя изменять AircraftID таким образом.', 16, 1);
+        ROLLBACK TRANSACTION;
+        RETURN;
+    END;
     -- проверка, есть ли попытки изменить статус самолета, у которого есть рейсы
     IF EXISTS (
         SELECT 1
