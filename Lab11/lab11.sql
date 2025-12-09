@@ -391,7 +391,7 @@ GO
 INSERT INTO PASSENGER
     (DocumentNumber, FirstName, LastName, DateOfBirth, Gender, Citizenship)
 VALUES
-    ('4010 123456', N'Ivan',   N'Ivanov',  '1990-05-12', 1, 'RUS'),
+    ('4010 123456', N'Ivan',   N'Ivanov',  '2000-05-12', 1, 'RUS'),
     ('4010 654321', N'Anna',   N'Petrova', '1995-09-03', 2, 'RUS'),
     ('AB987654321', N'John',  N'Smith',    '1988-12-02', 1, 'USA');
 GO
@@ -429,7 +429,7 @@ GO
 INSERT INTO TICKET
     (TicketNumber, Price, BookingDate, SeatNumber, ClassOfService, BaggageWeight, HandLuggageWeight, FlightID, PassengerID)
 SELECT
-    'UT202-000001', 8500, '2025-01-05',' 12A', 1, 20.00, 8.00, F.FlightID, P.PassengerID
+    'UT202-000001', 8500, '2025-01-05',' 12A', 1, NULL, 8.00, F.FlightID, P.PassengerID
 FROM FLIGHT F
 CROSS JOIN PASSENGER P
 WHERE F.FlightNumber   = 'UT202'
@@ -447,6 +447,20 @@ WHERE F.FlightNumber   = 'SU102'
 GO
 
 SELECT * FROM TICKET
+
+-- Таблица FLIGHT_CREW 
+INSERT INTO FLIGHT_CREW (FlightID, CrewID)
+SELECT
+    F.FlightID,
+    C.CrewID
+FROM FLIGHT AS F
+JOIN CREW   AS C
+    ON (F.FlightNumber = 'SU101' AND C.LicenseNumber IN ('RU-PLT-123456', 'RU-FA-345678')) 
+    OR (F.FlightNumber = 'SU102' AND C.LicenseNumber = 'RU-FO-234567')
+    OR (F.FlightNumber = 'UT202' AND C.LicenseNumber = 'RU-SFA-456789');
+GO
+
+SELECT * FROM FLIGHT_CREW 
 
 -- использование DISTINCT для вывода без дублирующихся записей
 SELECT DISTINCT
@@ -471,4 +485,113 @@ SELECT
 FROM PASSENGER
 ORDER BY DateOfBirth ASC;
 GO
+
+--
+-- INNER JOIN: рейсы и задействованные в них самолёты
+SELECT
+    F.FlightNumber,
+    F.FlightDate,
+    F.DepartureAirport,
+    F.ArrivalAirport,
+    A.BoardNumber,
+    A.Model
+FROM FLIGHT   AS F
+    INNER JOIN AIRCRAFT AS A
+        ON F.AircraftID = A.AircraftID;
+GO
+
+-- LEFT JOIN: все пассажиры и их билеты
+SELECT
+    P.FirstName + ' ' + P.LastName AS PassengerName,
+    P.DocumentNumber,
+    T.TicketNumber,
+    T.SeatNumber,
+    T.FlightID
+FROM PASSENGER AS P
+    LEFT JOIN TICKET AS T
+        ON P.PassengerID = T.PassengerID;
+GO
+
+-- RIGHT JOIN: все билеты и соответствующие им пассажиры, если найдутся
+SELECT
+    T.TicketNumber,
+    T.SeatNumber,
+    T.FlightID,
+    P.FirstName + ' ' + P.LastName AS PassengerName,
+    P.DocumentNumber
+FROM PASSENGER AS P
+    RIGHT JOIN TICKET AS T
+        ON P.PassengerID = T.PassengerID;
+GO
+
+-- FULL OUTER JOIN: все рейсы и все билеты, включая несвязанные
+SELECT
+    F.FlightNumber,
+    F.FlightDate,
+    F.DepartureAirport,
+    F.ArrivalAirport,
+    T.TicketNumber,
+    T.SeatNumber,
+    T.PassengerID
+FROM FLIGHT AS F
+    FULL OUTER JOIN TICKET AS T
+        ON F.FlightID = T.FlightID;
+GO
+
+-- LIKE: поиск рейсов авиакомпаний, код которых начинается на 'S' (например, 'SU')
+SELECT
+    FlightNumber,
+    FlightDate,
+    DepartureAirport,
+    ArrivalAirport,
+    Airline
+FROM FLIGHT
+WHERE Airline LIKE 'S%';
+GO
+
+-- BETWEEN: пассажиры, родившиеся в заданном диапазоне дат
+SELECT
+    FirstName + ' ' + LastName AS PassengerName,
+    DateOfBirth,
+    Citizenship
+FROM PASSENGER
+WHERE DateOfBirth BETWEEN '1985-01-01' AND '2000-12-31';
+GO
+
+-- IN: члены экипажа с определёнными должностями
+SELECT
+    FirstName + ' ' + LastName AS CrewName,
+    Position,
+    FlyingHours
+    Gender
+FROM CREW
+WHERE Position IN (1, 2);
+GO
+
+-- EXISTS: члены экипажа, которые уже были назначены хотя бы на один рейс
+SELECT
+    C.FirstName + ' ' + C.LastName AS CrewName,
+    C.Position,
+    C.FlyingHours,
+    C.LicenseExpiryDate,
+FROM CREW AS C
+WHERE EXISTS (
+    SELECT 1
+    FROM FLIGHT_CREW AS FC
+    WHERE FC.CrewID = C.CrewID
+);
+GO
+
+-- NULL: билеты без зарегистрированного багажа 
+SELECT
+    TicketNumber,
+    SeatNumber,
+    FlightID,
+    PassengerID,
+    BaggageWeight,
+    HandLuggageWeight
+FROM TICKET
+WHERE BaggageWeight IS NULL;
+GO
+
 
