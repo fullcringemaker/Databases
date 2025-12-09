@@ -267,7 +267,7 @@ VALUES
     ('ABCD1234', 'A320', 180, 2000.00, 5, 1, N'Airbus',
      'SU101', '2025-01-10', 'SVO', 'LED', '2025-01-10 07:30', '2025-01-10 08:00', '2025-01-10 09:30', 1, 'SU'),
     ('ABCD1234', 'A320', 180, 2000.00, 5, 1, N'Airbus',
-     'SU102', '2025-01-11', 'SVO', 'LED', '2025-01-10 07:30', '2025-01-10 08:00', '2025-01-10 09:30', 1, 'SU'),
+     'SU102', '2025-01-11', 'SVO', 'LED', '2025-01-11 07:30', '2025-01-11 08:00', '2025-01-11 09:30', 1, 'SU'),
     ('EFGH5678', 'B737', 160, 1800.00, 7, 1, N'Boeing',
      'UT202', '2025-01-11', 'LED', 'DME', '2025-01-11 12:00', '2025-01-11 12:30', '2025-01-11 14:00', 1, 'UT');
 GO
@@ -592,5 +592,55 @@ SELECT
     HandLuggageWeight
 FROM TICKET
 WHERE BaggageWeight IS NULL;
+GO
+
+-- GROUP BY + COUNT: Количество выполненных рейсов для каждого борта 
+SELECT
+    A.BoardNumber,
+    A.Model,
+    COUNT(F.FlightID) AS FlightCount
+FROM AIRCRAFT AS A
+    JOIN FLIGHT AS F
+        ON F.AircraftID = A.AircraftID
+GROUP BY
+    A.BoardNumber,
+    A.Model;
+GO
+
+-- HAVING + COUNT: Авиакомпании, у которых выполнялось более одного рейса
+SELECT
+    F.Airline,
+    COUNT(F.FlightID) AS FlightsPerAirline
+FROM FLIGHT F
+GROUP BY
+    F.Airline
+HAVING
+    COUNT(F.FlightID) > 1;
+GO
+
+-- SUM, MIN, MAX, AVG: Суммарная, минимальная, максимальная и средняя стоимость билетов по каждому рейсу
+SELECT
+    F.FlightNumber,
+    SUM(T.Price) AS TotalRevenue,    
+    MIN(T.Price) AS MinTicketPrice, 
+    MAX(T.Price) AS MaxTicketPrice,
+    AVG(T.Price) AS AvgTicketPrice 
+FROM FLIGHT F
+    JOIN TICKET T ON F.FlightID = T.FlightID
+GROUP BY
+    F.FlightNumber;
+GO
+
+-- COUNT по пассажирам: Количество билетов у каждого пассажира
+SELECT
+    P.FirstName + ' ' + P.LastName AS PassengerName,
+    P.DocumentNumber,
+    COUNT(T.TicketID) AS TicketCount
+FROM PASSENGER P
+    LEFT JOIN TICKET T ON P.PassengerID = T.PassengerID
+GROUP BY
+    P.FirstName,
+    P.LastName,
+    P.DocumentNumber;
 GO
 
