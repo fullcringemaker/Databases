@@ -419,11 +419,44 @@ SELECT * FROM CREW
 INSERT INTO TICKET
     (TicketNumber, Price, BookingDate, SeatNumber, ClassOfService, BaggageWeight, HandLuggageWeight, FlightID, PassengerID)
 SELECT
-    'SU101-000001', 8500, '2025-01-05', '12A', 1, 20.00, 8.00, F.FlightID, P.PassengerID
+    'UT202-000001', 8500, '2025-01-05', '12A', 1, 20.00, 8.00, F.FlightID, P.PassengerID
 FROM FLIGHT F
 CROSS JOIN PASSENGER P
-WHERE F.FlightNumber = 'UT202' AND P.DocumentNumber = '4010 654321'; 
+WHERE F.FlightNumber = 'V' AND P.DocumentNumber = '4010 654321'; 
+GO
+
+INSERT INTO TICKET
+    (TicketNumber, Price, BookingDate, SeatNumber, ClassOfService, BaggageWeight, HandLuggageWeight, FlightID, PassengerID)
+SELECT
+    'SU102-000002', 8500, '2025-01-05', '12A', 1, 20.00, 8.00, F.FlightID, P.PassengerID
+FROM FLIGHT F
+CROSS JOIN PASSENGER P
+WHERE F.FlightNumber = 'SU102' AND P.DocumentNumber = 'AB987654321'; 
 GO
 
 SELECT * FROM TICKET
+
+-- использование DISTINCT для вывода без дублирующихся записей
+SELECT DISTINCT
+    Manufacturer
+FROM AIRCRAFT;
+GO
+
+-- использование ORDER BY для сортировки от большего к меньшему с помощью DESC
+SELECT
+    FirstName + ' ' + LastName AS FullName,
+    Position,
+    FlyingHours
+FROM CREW
+ORDER BY FlyingHours DESC;
+GO
+
+-- использование ORDER BY для сортировки от большего к меньшему с помощью ASC
+SELECT
+    FirstName + ' ' + LastName AS FullName,
+    DateOfBirth,
+    Citizenship
+FROM PASSENGER
+ORDER BY DateOfBirth ASC;
+GO
 
