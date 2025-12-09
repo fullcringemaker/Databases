@@ -28,7 +28,6 @@ GO
 USE Lab11;
 GO
 
--- 2) Создание таблиц
 -- Таблица AIRCRAFT
 IF OBJECT_ID(N'AIRCRAFT', N'U') IS NOT NULL
     DROP TABLE AIRCRAFT;
@@ -184,7 +183,7 @@ AS
             ON F.AircraftID = A.AircraftID;
 GO
 
--- создание триггера для вставки через представления
+-- Триггер для вставки через представления
 IF OBJECT_ID(N'trigger_insertAircraftWithFlight', N'TR') IS NOT NULL
     DROP TRIGGER trigger_insertAircraftWithFlight;
 GO
@@ -198,17 +197,16 @@ BEGIN
     (
         -- взятие уникальных самолетов
         SELECT DISTINCT
-            I.BoardNumber,
-            I.Model,
-            I.PassengerCapacity,
-            I.LoadCapacity,
-            I.AircraftAge,
-            I.AircraftStatus,
-            I.Manufacturer
-        FROM INSERTED I
-        WHERE I.BoardNumber IS NOT NULL
+            i.BoardNumber,
+            i.Model,
+            i.PassengerCapacity,
+            i.LoadCapacity,
+            i.AircraftAge,
+            i.AircraftStatus,
+            i.Manufacturer
+        FROM INSERTED i
+        WHERE i.BoardNumber IS NOT NULL
     )
-
     -- добавлением уникальных самолетов, где нет повторений в бортовых номерах
     INSERT INTO AIRCRAFT
         (BoardNumber, Model, PassengerCapacity, LoadCapacity, AircraftAge, Status, Manufacturer)
@@ -227,28 +225,27 @@ BEGIN
         FROM AIRCRAFT A
         WHERE A.BoardNumber = DA.BoardNumber
     );
-
     -- добавление рейсов, связывая их с соответствующими самолётами 
     INSERT INTO FLIGHT
         (FlightNumber, FlightDate, DepartureAirport, ArrivalAirport, BoardingTime, DepartureTime, ArrivalTime, Status, AircraftID, Airline)
     SELECT
-        I.FlightNumber,
-        I.FlightDate,
-        I.DepartureAirport,
-        I.ArrivalAirport,
-        I.BoardingTime,
-        I.DepartureTime,
-        I.ArrivalTime,
-        I.FlightStatus,
+        i.FlightNumber,
+        i.FlightDate,
+        i.DepartureAirport,
+        i.ArrivalAirport,
+        i.BoardingTime,
+        i.DepartureTime,
+        i.ArrivalTime,
+        i.FlightStatus,
         A.AircraftID,
-        I.Airline
-    FROM INSERTED I
+        i.Airline
+    FROM INSERTED i
         INNER JOIN AIRCRAFT A
-            ON A.BoardNumber = I.BoardNumber;
+            ON A.BoardNumber = i.BoardNumber;
 END;
 GO
 
---Запретить прямую вставку в AIRCRAFT
+-- Запрет прямой вставки в AIRCRAFT
 --IF OBJECT_ID(N'trigger_PreventInsert_ToAircraft') IS NOT NULL
 --    DROP TRIGGER trigger_PreventInsert_ToAircraft;
 --GO
@@ -283,39 +280,104 @@ SELECT *
 FROM FLIGHT 
 GO
 
-IF OBJECT_ID(N'trigger_delete_Ticket') IS NOT NULL
-    DROP TRIGGER trigger_delete_Ticket;
+-- Триггер для удаления самолетов из AIRCRAFT
+IF OBJECT_ID(N'trigger_delete_Aircraft') IS NOT NULL
+    DROP TRIGGER trigger_delete_Aircraft;
 GO
 
-CREATE TRIGGER trigger_delete_Ticket
-ON TICKET
-AFTER DELETE
+CREATE TRIGGER trigger_delete_Aircraft
+ON AIRCRAFT
+INSTEAD OF DELETE
 AS
 BEGIN
-    -- Проверка, что нельзя удалить последний билет пассажира
+    -- проверка, есть ли хотя бы один рейс для удаляемых самолётов
     IF EXISTS (
         SELECT 1
         FROM deleted d
-        WHERE NOT EXISTS (
-            SELECT 1
-            FROM TICKET t
-            WHERE t.PassengerID = d.PassengerID
-        )
+        JOIN FLIGHT F
+          ON F.AircraftID = d.AircraftID
     )
     BEGIN
-        RAISERROR ('Нельзя удалить последний билет пассажира', 16, 1);
+        RAISERROR(N'Нельзя удалить воздушное судно, для которого существуют рейсы.', 16, 1);
         ROLLBACK TRANSACTION;
         RETURN;
     END;
-
-    -- Удаление, если условие выполнено
-    DELETE FROM TICKET
-    WHERE TicketID IN (
-        SELECT TicketID
-        FROM DELETED);
+    -- если связанных рейсов нет — выполняется delete
+    DELETE A
+    FROM AIRCRAFT A
+    JOIN deleted d
+      ON A.AircraftID = d.AircraftID;
 END;
 GO
 
-DELETE FROM TICKET
-WHERE TicketID = 3;
+--DELETE FROM AIRCRAFT
+--WHERE AircraftID = 1;
+
+INSERT INTO AIRCRAFT (BoardNumber, Model, PassengerCapacity, LoadCapacity, AircraftAge, Status, Manufacturer)
+VALUES ('RA12345', 'SSJ-100', 98, 1200.00, 3, 1, N'Иркут');
 GO
+
+DELETE FROM AIRCRAFT
+WHERE BoardNumber = 'RA12345';
+GO
+
+-- Триггер для обновления статуса самолетов из AIRCRAFT
+IF OBJECT_ID(N'trigger_UpdateAircraft') IS NOT NULL
+    DROP TRIGGER trigger_UpdateAircraft;
+GO
+
+CREATE TRIGGER trigger_UpdateAircraft
+ON AIRCRAFT
+INSTEAD OF UPDATE
+AS
+BEGIN
+    -- проверка, есть ли попытки изменить статус самолета, у которого есть рейсы
+    IF EXISTS (
+        SELECT 1
+        FROM inserted i
+        JOIN deleted d
+          ON i.AircraftID = d.AircraftID
+        WHERE i.Status <> d.Status AND i.Status = 2 AND EXISTS (
+                                                                    SELECT 1
+                                                                    FROM FLIGHT F
+                                                                    WHERE F.AircraftID = i.AircraftID
+          )
+    )
+    BEGIN
+        RAISERROR(N'Нельзя списывать воздушное судно, для которого существуют рейсы.', 16, 1);
+        ROLLBACK TRANSACTION;
+        RETURN;
+    END;
+    -- если условие не выполняется - выполняется update
+    UPDATE A
+    SET A.BoardNumber       = i.BoardNumber,
+        A.Model             = i.Model,
+        A.PassengerCapacity = i.PassengerCapacity,
+        A.LoadCapacity      = i.LoadCapacity,
+        A.AircraftAge       = i.AircraftAge,
+        A.Status            = i.Status,
+        A.Manufacturer      = i.Manufacturer
+    FROM AIRCRAFT A
+    JOIN inserted i
+      ON A.AircraftID = i.AircraftID;
+END;
+GO
+
+--UPDATE AIRCRAFT
+--SET Status = 2
+--WHERE AircraftID = 1;
+--GO
+
+INSERT INTO AIRCRAFT (BoardNumber, Model, PassengerCapacity, LoadCapacity, AircraftAge, Status, Manufacturer)
+VALUES ('RA67890', 'A321', 220, 2100.00, 4, 1, N'Airbus');
+GO
+
+UPDATE AIRCRAFT
+SET Status = 2
+WHERE BoardNumber = 'RA67890';
+GO
+
+SELECT *
+FROM AIRCRAFT
+GO
+
