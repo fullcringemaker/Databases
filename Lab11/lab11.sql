@@ -753,7 +753,7 @@ GO
 --WHERE T.TicketNumber = 'SU101-000001';
 --GO
 
--- 7) Хранимая процедура для получения всех билетов, связанных с конкретным пассажиром
+-- Хранимая процедура для получения всех билетов, связанных с конкретным пассажиром
 IF OBJECT_ID(N'GetPassengerTickets') IS NOT NULL
     DROP PROCEDURE GetPassengerTickets;
 GO
