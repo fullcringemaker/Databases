@@ -184,7 +184,7 @@ AS
 GO
 
 -- Триггер: вставка значений AIRCRAFT и FLIGHT через представления
-IF OBJECT_ID(N'trigger_Insert_AircraftWithFlight', N'TR') IS NOT NULL
+IF OBJECT_ID(N'trigger_Insert_AircraftWithFlight') IS NOT NULL
     DROP TRIGGER trigger_Insert_AircraftWithFlight;
 GO
 
