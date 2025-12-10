@@ -439,16 +439,16 @@ INSERT INTO TICKET
     (TicketNumber, Price, BookingDate, SeatNumber, ClassOfService,
      BaggageWeight, HandLuggageWeight, FlightID, PassengerID)
 VALUES
-    ('SU102-000001', 9000, '2025-01-06', '14A', 1, 20.00, 7.00, 2, 2),
+    ('SU102-000001', 9000, '2025-01-06', '13A', 2, 20.00, 10.00, 2, 2),
     ('SU102-000002', 9100, '2025-01-06', '14B', 1, 18.00, 7.00, 2, 3),
-    ('SU102-000003', 9100, '2025-01-07', '15C', 2, NULL, 5.00, 2, 3);
+    ('SU102-000003', 9100, '2025-01-07', '14C', 1, NULL, 5.00, 2, 3);
 GO
 
 INSERT INTO TICKET
     (TicketNumber, Price, BookingDate, SeatNumber, ClassOfService,
      BaggageWeight, HandLuggageWeight, FlightID, PassengerID)
 VALUES
-    ('UT202-000001', 8500, '2025-01-05', '12A', 1, NULL, 8.00, 3, 4),
+    ('UT202-000001', 8500, '2025-01-05', '12A', 2, NULL, 8.00, 3, 4),
     ('UT202-000002', 8600, '2025-01-05', '12B', 2, 15.00, 6.00, 3, 4);
 GO
 
@@ -456,7 +456,7 @@ INSERT INTO TICKET
     (TicketNumber, Price, BookingDate, SeatNumber, ClassOfService,
      BaggageWeight, HandLuggageWeight, FlightID, PassengerID)
 VALUES
-    ('DP305-000001', 12000, '2025-01-08', '2C', 1, 23.00, 8.00, 4, 5);
+    ('DP305-000001', 12000, '2025-01-08', '2C', 3, 25.00, 15.00, 4, 5);
 GO
 
 SELECT * FROM TICKET
@@ -764,7 +764,7 @@ AS
 BEGIN
     SELECT
         P.PassengerID,
-        P.FirstName + N' ' + P.LastName AS PassengerName,
+        P.FirstName + N' ' + P.LastName AS PassengerFullName,
         P.DocumentNumber,
         T.TicketID,
         T.TicketNumber,
@@ -845,7 +845,7 @@ RETURN
         T.BaggageWeight,
         T.HandLuggageWeight,
         P.PassengerID,
-        P.FirstName + N' ' + P.LastName AS PassengerName,
+        P.FirstName + N' ' + P.LastName AS PassengerFullName,
         P.DocumentNumber,
         F.FlightNumber,
         F.FlightDate,
