@@ -178,8 +178,8 @@ AS
         F.ArrivalTime,
         F.Status      AS FlightStatus,   
         F.Airline
-    FROM AIRCRAFT A
-        LEFT JOIN FLIGHT F
+    FROM AIRCRAFT AS A
+        LEFT JOIN FLIGHT AS F
             ON F.AircraftID = A.AircraftID;
 GO
 
@@ -222,7 +222,7 @@ BEGIN
     WHERE NOT EXISTS
     (
         SELECT 1
-        FROM AIRCRAFT A
+        FROM AIRCRAFT AS A
         WHERE A.BoardNumber = DA.BoardNumber
     );
     -- добавление рейсов, связывая их с соответствующими самолётами 
@@ -239,8 +239,8 @@ BEGIN
         i.FlightStatus,
         A.AircraftID,
         i.Airline
-    FROM inserted i
-        INNER JOIN AIRCRAFT A
+    FROM inserted AS i
+        INNER JOIN AIRCRAFT AS A
             ON A.BoardNumber = i.BoardNumber;
 END;
 GO
@@ -306,8 +306,8 @@ BEGIN
     END;
     -- если связанных рейсов нет — выполняется delete
     DELETE A
-    FROM AIRCRAFT A
-    JOIN deleted d
+    FROM AIRCRAFT AS A
+    JOIN deleted AS d
       ON A.AircraftID = d.AircraftID;
 END;
 GO
@@ -342,8 +342,8 @@ BEGIN
     -- проверка, есть ли попытки изменить статус самолета, у которого есть рейсы
     IF EXISTS (
         SELECT 1
-        FROM inserted i
-        JOIN deleted d
+        FROM inserted AS i
+        JOIN deleted AS d
           ON i.AircraftID = d.AircraftID
         WHERE i.Status <> d.Status AND i.Status = 2 AND EXISTS (
                                                                     SELECT 1
@@ -365,12 +365,13 @@ BEGIN
         A.AircraftAge       = i.AircraftAge,
         A.Status            = i.Status,
         A.Manufacturer      = i.Manufacturer
-    FROM AIRCRAFT A
-    JOIN inserted i
+    FROM AIRCRAFT AS A
+    JOIN inserted AS i
       ON A.AircraftID = i.AircraftID;
 END;
 GO
 
+--ошибочная попытка update
 --UPDATE AIRCRAFT
 --SET Status = 2
 --WHERE AircraftID = 1;
@@ -475,13 +476,13 @@ GO
 
 SELECT * FROM FLIGHT_CREW 
 
--- DISTINCT: для вывода без дублирующихся записей
+-- DISTINCT: вывод производителей без повторений
 SELECT DISTINCT
     Manufacturer
 FROM AIRCRAFT;
 GO
 
--- ORDER BY: для сортировки от большего к меньшему с помощью DESC
+-- ORDER BY: сортировки по часам налета от большего к меньшему с помощью DESC
 SELECT
     FirstName + ' ' + LastName AS FullName,
     Position,
@@ -490,7 +491,7 @@ FROM CREW
 ORDER BY FlyingHours DESC;
 GO
 
--- ORDER BY: для сортировки от большего к меньшему с помощью ASC
+-- ORDER BY: сортировка по дате рождения от большего к меньшему с помощью ASC
 SELECT
     FirstName + ' ' + LastName AS FullName,
     DateOfBirth,
@@ -507,7 +508,7 @@ SELECT
     F.ArrivalAirport,
     A.BoardNumber,
     A.Model
-FROM FLIGHT   AS F
+FROM FLIGHT AS F
     INNER JOIN AIRCRAFT AS A
         ON F.AircraftID = A.AircraftID;
 GO
@@ -524,7 +525,7 @@ FROM PASSENGER AS P
         ON P.PassengerID = T.PassengerID;
 GO
 
--- RIGHT JOIN: все билеты и соответствующие им пассажиры, если найдутся
+-- RIGHT JOIN: все билеты и соответствующие им пассажиры
 SELECT
     T.TicketNumber,
     T.SeatNumber,
@@ -536,7 +537,7 @@ FROM PASSENGER AS P
         ON P.PassengerID = T.PassengerID;
 GO
 
--- FULL OUTER JOIN: все рейсы и все билеты, включая несвязанные
+-- FULL OUTER JOIN: все рейсы и все билеты на них
 SELECT
     F.FlightNumber,
     F.FlightDate,
@@ -550,7 +551,7 @@ FROM FLIGHT AS F
         ON F.FlightID = T.FlightID;
 GO
 
--- LIKE: поиск рейсов авиакомпаний, код которых начинается на 'S' (например, 'SU')
+-- LIKE: поиск рейсов авиакомпаний, код которых начинается на 'S'
 SELECT
     FlightNumber,
     FlightDate,
@@ -567,7 +568,7 @@ SELECT
     DateOfBirth,
     Citizenship
 FROM PASSENGER
-WHERE DateOfBirth BETWEEN '1985-01-01' AND '2000-12-31';
+WHERE DateOfBirth BETWEEN '1985-01-01' AND '1994-12-31';
 GO
 
 -- IN: члены экипажа с определёнными должностями
@@ -625,7 +626,7 @@ GO
 SELECT
     F.Airline,
     COUNT(F.FlightID) AS FlightsPerAirline
-FROM FLIGHT F
+FROM FLIGHT AS F
 GROUP BY
     F.Airline
 HAVING
@@ -635,12 +636,13 @@ GO
 -- SUM, MIN, MAX, AVG: Суммарная, минимальная, максимальная и средняя стоимость билетов по каждому рейсу
 SELECT
     F.FlightNumber,
-    SUM(T.Price) AS TotalRevenue,    
+    SUM(T.Price) AS SumTicketsPrice,    
     MIN(T.Price) AS MinTicketPrice, 
     MAX(T.Price) AS MaxTicketPrice,
     AVG(T.Price) AS AvgTicketPrice 
-FROM FLIGHT F
-    JOIN TICKET T ON F.FlightID = T.FlightID
+FROM FLIGHT AS F
+    JOIN TICKET AS T 
+        ON F.FlightID = T.FlightID
 GROUP BY
     F.FlightNumber;
 GO
@@ -650,15 +652,16 @@ SELECT
     P.FirstName + ' ' + P.LastName AS PassengerName,
     P.DocumentNumber,
     COUNT(T.TicketID) AS TicketCount
-FROM PASSENGER P
-    LEFT JOIN TICKET T ON P.PassengerID = T.PassengerID
+FROM PASSENGER AS P
+    LEFT JOIN TICKET AS T 
+        ON P.PassengerID = T.PassengerID
 GROUP BY
     P.FirstName,
     P.LastName,
     P.DocumentNumber;
 GO
 
--- UNION: список всех людей в системе без повторов.
+-- UNION: все аэропорты вылета и прилёта со всех рейсов без повторов
 SELECT
     F.DepartureAirport AS AirportCode,
     'DEPARTURE'        AS AirportRole
@@ -670,7 +673,7 @@ SELECT
 FROM FLIGHT AS F;
 GO
 
--- UNION ALL: все аэропорты вылета и прилёта со всех рейсов с сохранением повторов.
+-- UNION ALL: все аэропорты вылета и прилёта со всех рейсов с повторами
 SELECT
     F.DepartureAirport AS AirportCode,
     'DEPARTURE'        AS AirportRole
@@ -682,7 +685,7 @@ SELECT
 FROM FLIGHT AS F;
 GO
 
--- EXCEPT: имена членов экипажа, которых НЕТ среди пассажиров.
+-- EXCEPT: имена членов экипажа, которых НЕТ среди пассажиров
 SELECT
     C.FirstName + N' ' + C.LastName AS Name
 FROM CREW AS C
@@ -692,7 +695,7 @@ SELECT
 FROM PASSENGER AS P;
 GO
 
--- INTERSECT: имена, которые одновременно встречаются и у пассажиров, и у членов экипажа.
+-- INTERSECT: имена, которые одновременно встречаются и у пассажиров, и у членов экипажа
 SELECT
     C.FirstName + N' ' + C.LastName AS Name
 FROM CREW AS C
