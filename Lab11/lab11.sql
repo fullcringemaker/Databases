@@ -754,7 +754,7 @@ GO
 --GO
 
 -- 7) Хранимая процедура для получения всех билетов, связанных с конкретным пассажиром
-IF OBJECT_ID(N'GetPassengerTickets', N'P') IS NOT NULL
+IF OBJECT_ID(N'GetPassengerTickets') IS NOT NULL
     DROP PROCEDURE GetPassengerTickets;
 GO
 
