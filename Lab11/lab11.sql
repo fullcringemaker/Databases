@@ -796,3 +796,68 @@ GO
 EXEC GetPassengerTickets @PassengerID = 3;
 GO
 
+-- Скалярная функция: количество членов экипажа для указанного рейса
+IF OBJECT_ID(N'function_GetCrewCountForFlight') IS NOT NULL
+    DROP FUNCTION function_GetCrewCountForFlight;
+GO
+
+CREATE FUNCTION fn_GetCrewCountForFlight
+(
+    @FlightID INT
+)
+RETURNS INT
+AS
+BEGIN
+    DECLARE @CrewCount INT;
+    SELECT @CrewCount = COUNT(*)
+    FROM FLIGHT_CREW FC
+    WHERE FC.FlightID = @FlightID;
+    RETURN @CrewCount;
+END;
+GO
+
+SELECT dbo.fn_GetCrewCountForFlight(1) AS CrewCountForFlight;
+GO
+
+-- Табличная функция: все билеты, связанные с указанным рейсом
+IF OBJECT_ID(N'function_GetTicketsByFlight') IS NOT NULL
+    DROP FUNCTION function_GetTicketsByFlight;
+GO
+
+CREATE FUNCTION function_GetTicketsByFlight
+(
+    @FlightID INT
+)
+RETURNS TABLE
+AS
+RETURN
+(
+    SELECT
+        T.TicketID,
+        T.TicketNumber,
+        T.Price,
+        T.BookingDate,
+        T.SeatNumber,
+        T.ClassOfService,
+        T.BaggageWeight,
+        T.HandLuggageWeight,
+        P.PassengerID,
+        P.FirstName + N' ' + P.LastName AS PassengerName,
+        P.DocumentNumber,
+        F.FlightNumber,
+        F.FlightDate,
+        F.DepartureAirport,
+        F.ArrivalAirport,
+        F.Airline
+    FROM TICKET AS T
+        INNER JOIN PASSENGER AS P
+            ON T.PassengerID = P.PassengerID
+        INNER JOIN FLIGHT AS F
+            ON T.FlightID = F.FlightID
+    WHERE T.FlightID = @FlightID
+);
+GO
+
+SELECT *
+FROM dbo.function_GetTicketsByFlight(3);
+GO
