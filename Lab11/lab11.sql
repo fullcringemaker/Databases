@@ -17,7 +17,7 @@ ON PRIMARY(
     MAXSIZE = UNLIMITED, 
     FILEGROWTH = 5%
 )
-LOG ON (NAME = Lab_9log,
+LOG ON (NAME = Lab_11log,
     FILENAME = 'D:\database\lab11\Lab11_log.ldf',
     SIZE = 5MB,
     MAXSIZE = 25MB,
@@ -183,7 +183,7 @@ AS
             ON F.AircraftID = A.AircraftID;
 GO
 
--- Триггер для вставки значений AIRCRAFT и FLIGHT через представления
+-- Триггер: вставка значений AIRCRAFT и FLIGHT через представления
 IF OBJECT_ID(N'trigger_Insert_AircraftWithFlight', N'TR') IS NOT NULL
     DROP TRIGGER trigger_Insert_AircraftWithFlight;
 GO
@@ -801,7 +801,7 @@ IF OBJECT_ID(N'function_GetCrewCountForFlight') IS NOT NULL
     DROP FUNCTION function_GetCrewCountForFlight;
 GO
 
-CREATE FUNCTION fn_GetCrewCountForFlight
+CREATE FUNCTION function_GetCrewCountForFlight
 (
     @FlightID INT
 )
@@ -816,7 +816,7 @@ BEGIN
 END;
 GO
 
-SELECT dbo.fn_GetCrewCountForFlight(1) AS CrewCountForFlight;
+SELECT dbo.function_GetCrewCountForFlight(1) AS CrewCountForFlight;
 GO
 
 -- Табличная функция: все билеты, связанные с указанным рейсом
