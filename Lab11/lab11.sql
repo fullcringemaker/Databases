@@ -750,3 +750,49 @@ GO
 --WHERE T.TicketNumber = 'SU101-000001';
 --GO
 
+-- 7) Хранимая процедура для получения всех билетов, связанных с конкретным пассажиром
+IF OBJECT_ID(N'GetPassengerTickets', N'P') IS NOT NULL
+    DROP PROCEDURE GetPassengerTickets;
+GO
+
+CREATE PROCEDURE GetPassengerTickets
+    @PassengerID INT
+AS
+BEGIN
+    SELECT
+        P.PassengerID,
+        P.FirstName + N' ' + P.LastName AS PassengerName,
+        P.DocumentNumber,
+        T.TicketID,
+        T.TicketNumber,
+        T.Price,
+        T.BookingDate,
+        T.SeatNumber,
+        T.ClassOfService,
+        T.BaggageWeight,
+        T.HandLuggageWeight,
+        F.FlightID,
+        F.FlightNumber,
+        F.FlightDate,
+        F.DepartureAirport,
+        F.ArrivalAirport,
+        F.BoardingTime,
+        F.DepartureTime,
+        F.ArrivalTime,
+        F.Airline
+    FROM TICKET AS T
+        INNER JOIN PASSENGER AS P
+            ON T.PassengerID = P.PassengerID
+        INNER JOIN FLIGHT AS F
+            ON T.FlightID = F.FlightID
+    WHERE T.PassengerID = @PassengerID
+    ORDER BY
+        F.FlightDate,
+        F.FlightNumber,
+        T.TicketNumber;
+END;
+GO
+
+EXEC GetPassengerTickets @PassengerID = 3;
+GO
+
