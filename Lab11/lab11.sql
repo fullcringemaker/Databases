@@ -267,11 +267,11 @@ VALUES
     ('RA-82001', 'A320', 180, 2000.00, 5, 1, N'Airbus',
      'SU101', '2025-01-10', 'SVO', 'LED', '2025-01-10 07:30', '2025-01-10 08:00', '2025-01-10 09:30', 1, 'SU'),
     ('RA-82002', 'A321', 200, 2100.00, 4, 1, N'Airbus',
-     'SU102', '2025-01-11', 'SVO', 'LED', '2025-01-11 09:00', '2025-01-11 09:30', '2025-01-11 11:00', 1, 'SU'),
+     'SU102', '2025-01-08', 'SVO', 'LED', '2025-01-08 09:00', '2025-01-08 09:30', '2025-01-08 11:00', 1, 'SU'),
     ('VP-B737', 'B737', 160, 1800.00, 7, 1, N'Boeing',
-     'UT202', '2025-01-12', 'LED', 'DME', '2025-01-12 12:00', '2025-01-12 12:30', '2025-01-12 14:00', 1, 'UT'),
+     'UT202', '2025-01-09', 'LED', 'DME', '2025-01-09 12:00', '2025-01-09 12:30', '2025-01-09 14:00', 1, 'UT'),
     ('VQ-B781', 'B777', 300, 3000.00, 6, 1, N'Boeing',
-     'DP305', '2025-01-12', 'DME', 'LHR', '2025-01-12 14:00', '2025-01-12 14:40', '2025-01-12 18:30', 1, 'DP');
+     'DP305', '2025-01-09', 'DME', 'LHR', '2025-01-09 14:00', '2025-01-09 14:40', '2025-01-09 18:30', 1, 'DP');
 GO
 
 SELECT *
@@ -861,3 +861,75 @@ GO
 SELECT *
 FROM dbo.function_GetTicketsByFlight(3);
 GO
+
+-- Таблица для логирования вставок билетов
+IF OBJECT_ID(N'TicketLog') IS NOT NULL
+    DROP TABLE TicketLog;
+GO
+
+CREATE TABLE TicketLog
+(
+    LogID       INT IDENTITY(1,1) PRIMARY KEY,
+    TicketID    INT,               
+    PassengerID INT,               
+    FlightID    INT,               
+    Action      NVARCHAR(50),      
+    LogDate     DATETIME DEFAULT GETDATE()
+);
+GO
+
+-- Триггер на вставку билетов: проверка корректности и логирование вставки
+IF OBJECT_ID(N'trigger_Insert_Ticket') IS NOT NULL
+    DROP TRIGGER trigger_Insert_Ticket;
+GO
+
+CREATE TRIGGER trigger_Insert_Ticket
+ON TICKET
+AFTER INSERT
+AS
+BEGIN
+    -- Проверка: дата бронирования не может быть позднее даты рейса
+    IF EXISTS (
+        SELECT 1
+        FROM inserted i
+        JOIN FLIGHT f
+            ON i.FlightID = f.FlightID
+        WHERE i.BookingDate > f.FlightDate
+    )
+    BEGIN
+        RAISERROR (N'Дата бронирования не может быть позднее даты рейса.', 16, 1);
+        ROLLBACK TRANSACTION;
+        RETURN;
+    END;
+    -- Логирование вставки билетов
+    INSERT INTO TicketLog
+        (TicketID, PassengerID, FlightID, Action)
+    SELECT
+        i.TicketID,
+        i.PassengerID,
+        i.FlightID,
+        N'INSERT'
+    FROM inserted AS i;
+END;
+GO
+
+INSERT INTO TICKET
+    (TicketNumber, Price, BookingDate, SeatNumber, ClassOfService,
+     BaggageWeight, HandLuggageWeight, FlightID, PassengerID)
+VALUES
+    ('SU102-000010', 9500, '2025-01-05', '16A', 1,
+     20.00, 7.00, 2, 2);
+GO
+
+SELECT *
+FROM TicketLog;
+GO
+
+-- вставка с ошибочными данными (дата бронирования позже даты рейса)
+--INSERT INTO TICKET
+--    (TicketNumber, Price, BookingDate, SeatNumber, ClassOfService,
+--     BaggageWeight, HandLuggageWeight, FlightID, PassengerID)
+--VALUES
+--    ('SU102-000011', 9600, '2025-01-12', '16B', 1,
+--     18.00, 7.00, 2, 2); 
+--GO
