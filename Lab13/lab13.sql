@@ -102,11 +102,11 @@ GO
 -- Вставка данных в CrewView
 INSERT INTO dbo.CrewView
 VALUES
-    (1, 'LIC-0001', N'Ivan', N'Petrov', 1, '2027-06-30'), 
-    (2, 'LIC-0002', N'Petr', N'Ivaov', 2, '2028-01-15'),
-    (3, 'LIC-0003', N'Vasiliy', N'Sidorov', 3, '2026-11-20'),
-    (4, 'LIC-0004', N'Alica', N'Smirnova', 4, '2029-03-10'),
-    (5, 'LIC-0005', N'Giorgiy', N'Kuznetsov', 3, '2027-09-05');
+    (1, 'LIC-4551', N'Ivan', N'Petrov', 1, '2027-06-30'), 
+    (2, 'LIC-9571', N'Petr', N'Ivaov', 2, '2028-01-15'),
+    (3, 'LIC-3391', N'Vasiliy', N'Sidorov', 3, '2026-11-20'),
+    (4, 'LIC-7784', N'Alica', N'Smirnova', 4, '2029-03-10'),
+    (5, 'LIC-7023', N'Giorgiy', N'Kuznetsov', 3, '2027-09-05');
 GO
 
 -- Проверка содержимого представления и таблиц
@@ -132,7 +132,7 @@ GO
 -- Вставка новой строки в представление
 INSERT INTO dbo.CrewView 
 VALUES
-    (8, 'LIC-0008', N'Max', N'Volkov', 4, '2031-05-20');
+    (8, 'LIC-1433', N'Max', N'Volkov', 4, '2031-05-20');
 GO
 
 -- Проверка содержимого представления и таблиц после изменения
